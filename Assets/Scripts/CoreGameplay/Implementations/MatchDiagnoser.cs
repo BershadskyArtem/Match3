@@ -9,6 +9,8 @@ namespace CoreGameplay.Implementations
     {
         private readonly List<IMatchRule> _matchRules;
 
+        private bool[,] _matchedMap;
+
         public MatchDiagnoser()
         {
             _matchRules = new List<IMatchRule>();
@@ -16,20 +18,29 @@ namespace CoreGameplay.Implementations
         
         public IEnumerable<Match> GetMatchesFromBoard(NodeObject[,] board)
         {
+            int width = board.GetLength(0);
+            int height = board.GetLength(1);
+            
+            _matchedMap = new bool[width, height];
+            
             List<Match> result = new List<Match>();
 
-            for (int x = 0; x < board.GetLength(0); x++)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < board.GetLength(1); y++)
+                for (int y = 0; y < height; y++)
                 {
+                    if(_matchedMap[x,y]) continue;
                     foreach (var matchRule in _matchRules)
                     {
                         var m = new Match(new Vector2Int(x , y) , board[x,y].GetColor());
-                        if (matchRule.TryGetMatchAtPoint(board, x, y, ref m))
+                        if (!matchRule.TryGetMatchAtPoint(board, x, y, ref m)) continue;
+                        
+                        result.Add(m);
+                        foreach (var position in m.Positions)
                         {
-                            result.Add(m);
-                            break;
+                            _matchedMap[position.x, position.y] = true;
                         }
+                        break;
                     }
                 }
             }

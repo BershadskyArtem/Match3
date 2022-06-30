@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CoreGameplay.Base;
 using CoreGameplay.Implementations;
 using CoreGameplay.Matches.Rules;
@@ -76,11 +77,17 @@ namespace CoreGameplay
         {
             ResetBoard();
             var board = _boardProvider.GetNewBoard(width, height);
-            
             ForeachNode(board , (nodeObject, x, y) =>
             {
                 InstantiateNode(nodeObject , x , y);
             } );
+            VerifyBoard();
+            ForeachNode(_board , (board, x, y) =>
+            {
+                MoveNodeToCoord(board[x, y], x, y);
+            });
+            
+            
         }
 
         private void InstantiateNode(GameObject obj , int x , int y)
@@ -90,9 +97,14 @@ namespace CoreGameplay
             var o = Instantiate(obj);
             o.GetComponent<RectTransform>().SetParent(boardParent);
             var no = o.GetComponent<NodeObject>();
-            no.MoveToPosition(new Vector2Int(x, y) , true);
+           // no.MoveToPosition(new Vector2Int(x, y) , true);
             no.SetBoard(this);
             _board[x, y] = no;
+        }
+
+        private void MoveNodeToCoord(NodeObject node , int x , int y)
+        {
+            node.MoveToPosition(new Vector2Int(x, y) , true);
         }
 
         private void SetNodeAtPoint(GameObject obj, int x , int y)
@@ -103,7 +115,9 @@ namespace CoreGameplay
 
         private void VerifyBoard()
         {
+            
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
+            Debug.Log($"Verified = {matches.Count()}");
             foreach (var match in matches)
             {
                 SetNodeAtPoint(
@@ -112,6 +126,7 @@ namespace CoreGameplay
                     match.Origin.y);
             }
         }
+        
         
         
     }

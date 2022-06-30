@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6315835388039056163}
   - component: {fileID: 6315835388039056162}
   - component: {fileID: 6315835388039056165}
+  - component: {fileID: 7785733402613943276}
   m_Layer: 5
   m_Name: GreenNode
   m_TagString: Untagged
@@ -89,7 +90,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rect: {fileID: 6315835388039056164}
+  _control: {fileID: 7785733402613943276}
   gap: 110
   longTime: 1
   shortTime: 0.25
   color: 2
+--- !u!114 &7785733402613943276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6315835388039056167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb3696864c914348ac7b79b861ce2e33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

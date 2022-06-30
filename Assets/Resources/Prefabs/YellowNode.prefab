@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2765199525854627967}
   - component: {fileID: 2765199525854627966}
   - component: {fileID: 2765199525854627961}
+  - component: {fileID: 5856568693918099789}
   m_Layer: 5
   m_Name: YellowNode
   m_TagString: Untagged
@@ -89,7 +90,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rect: {fileID: 2765199525854627960}
+  _control: {fileID: 5856568693918099789}
   gap: 110
   longTime: 1
   shortTime: 0.25
   color: 3
+--- !u!114 &5856568693918099789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2765199525854627963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb3696864c914348ac7b79b861ce2e33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

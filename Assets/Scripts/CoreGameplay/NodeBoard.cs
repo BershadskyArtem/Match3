@@ -148,7 +148,6 @@ namespace CoreGameplay
         {
             return x >= 0 && x < width && y >= 0 && y < height;
         }
-
         private void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
         {
             //swipe visuals

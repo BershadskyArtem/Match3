@@ -13,7 +13,6 @@ namespace CoreGameplay
         [SerializeField] private float time;
 
         private Vector2Int _indexedPosition;
-        private NodeBoard _board;
 
         private void Awake()
         {
@@ -25,11 +24,6 @@ namespace CoreGameplay
             if(index == _indexedPosition) return;
             _indexedPosition = index;
             rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), time , true).SetEase(Ease.InQuad);
-        }
-
-        public void SetBoard(NodeBoard board)
-        {
-            _board = board;
         }
 
     }

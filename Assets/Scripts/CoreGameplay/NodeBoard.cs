@@ -1,5 +1,7 @@
 ﻿using System;
 using CoreGameplay.Base;
+using CoreGameplay.Implementations;
+using CoreGameplay.Matches.Rules;
 using UnityEngine;
 
 namespace CoreGameplay
@@ -11,11 +13,17 @@ namespace CoreGameplay
         [SerializeField] private int height;
         [SerializeField] private RectTransform boardParent;
         private NodeObject[,] _board;
+        
         private readonly IBoardProvider _boardProvider;
+        private readonly IMatchDiagnoser _matchDiagnoser;
         
         public NodeBoard()
         {
             _boardProvider = new RandomBoardProvider();
+            _matchDiagnoser = new MatchDiagnoser()
+                .AddMatchRule(new CrossMatchRule())
+                .AddMatchRule(new HorizontalMatchRule())
+                .AddMatchRule(new VerticalMatchRule());
         }
 
         public void ResetBoard()
@@ -86,8 +94,24 @@ namespace CoreGameplay
             no.SetBoard(this);
             _board[x, y] = no;
         }
-        
-        private void VerifyBoard(){}
+
+        private void SetNodeAtPoint(GameObject obj, int x , int y)
+        {
+            Destroy(_board[x,y].gameObject);
+            InstantiateNode(obj , x ,y);
+        }
+
+        private void VerifyBoard()
+        {
+            var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
+            foreach (var match in matches)
+            {
+                SetNodeAtPoint(
+                    NodeFactory.Instance.GetOpposite(match.Color)
+                    , match.Origin.x , 
+                    match.Origin.y);
+            }
+        }
         
         
     }

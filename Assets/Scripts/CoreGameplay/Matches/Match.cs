@@ -41,6 +41,11 @@ namespace CoreGameplay.Matches
                 AddPosition(pos);
             }
         }
+
+        public Match CloneWithoutPositions()
+        {
+            return new Match(this.Origin , this.Color);
+        }
         
     }
 }

@@ -11,7 +11,13 @@ namespace CoreGameplay.Matches
         public readonly NodeColor Color;
         public int Rank => Positions.Count;
 
-        public static Match Zero=> new Match();
+        public static Match Zero => new Match();
+
+        public static bool isZero(Match match)
+        {
+            return match.Rank == 0;
+        }
+        
 
         private Match()
         {

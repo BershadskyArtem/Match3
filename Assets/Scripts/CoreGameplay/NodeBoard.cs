@@ -2,6 +2,7 @@
 using System.Linq;
 using CoreGameplay.Base;
 using CoreGameplay.Implementations;
+using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
 using UnityEngine;
 
@@ -82,6 +83,8 @@ namespace CoreGameplay
                 InstantiateNode(nodeObject , x , y);
             } );
             VerifyBoard();
+            VerifyBoard();
+            VerifyBoard();
             ForeachNode(_board , (board, x, y) =>
             {
                 MoveNodeToCoord(board[x, y], x, y);
@@ -95,9 +98,8 @@ namespace CoreGameplay
             if (obj == null) throw new NullReferenceException("Prefab is null");
 
             var o = Instantiate(obj);
-            o.GetComponent<RectTransform>().SetParent(boardParent);
+            o.GetComponent<RectTransform>().SetParent(boardParent , false);
             var no = o.GetComponent<NodeObject>();
-           // no.MoveToPosition(new Vector2Int(x, y) , true);
             no.SetBoard(this);
             _board[x, y] = no;
         }
@@ -126,8 +128,37 @@ namespace CoreGameplay
                     match.Origin.y);
             }
         }
-        
-        
+
+        public void TrySwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
+        {
+            if(!IsInsideBoard(pos1) || !IsInsideBoard(pos2)) return;
+            
+            SwipeTwoNodes(pos1 , pos2);
+
+            var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);
+            var pm2 = _matchDiagnoser.GetMatchAtPoint(_board, pos2.x, pos2.y);
+            
+            if(!Match.isZero(pm1) || !Match.isZero(pm2)) return;
+            
+            SwipeTwoNodes(pos1 , pos2);
+        }
+
+        private bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x , pos.y);
+        private bool IsInsideBoard(int x , int y)
+        {
+            return x >= 0 && x < width && y >= 0 && y < height;
+        }
+
+        private void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
+        {
+            //swipe visuals
+            _board[pos1.x, pos1.y].MoveToPosition(pos2 , false);
+            _board[pos2.x, pos2.y].MoveToPosition(pos1 , false);
+            
+            //swipe in array
+            (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
+            
+        }
         
     }
 }

@@ -10,6 +10,7 @@ namespace CoreGameplay
     {
         [Header("Components")] 
         [SerializeField] private RectTransform rect;
+        [SerializeField] private NodeControl _control;
         [SerializeField] private float gap;
         [SerializeField] private float longTime;
         [SerializeField] private float shortTime;
@@ -21,6 +22,7 @@ namespace CoreGameplay
         private void Awake()
         {
             _indexedPosition = new Vector2Int(-100,-100);
+            _control.OnSwipe += HandleSwiping;
         }
 
         public void MoveToPosition(Vector2Int index , bool useLongTime)
@@ -44,6 +46,25 @@ namespace CoreGameplay
         }
 
         public NodeColor GetColor() => color;
+
+        private void HandleSwiping(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Down:
+                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.down);
+                    break;
+                case Direction.Left:
+                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.left);
+                    break;
+                case Direction.Right:
+                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.right);
+                    break;
+                case Direction.Up:
+                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.up);
+                    break;
+            }
+        }
 
     }
 }

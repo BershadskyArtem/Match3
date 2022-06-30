@@ -18,11 +18,6 @@ namespace CoreGameplay
             _boardProvider = new RandomBoardProvider();
         }
 
-        public void StartBoard()
-        {
-            ResetBoard();
-        }
-
         public void ResetBoard()
         {
             if (_board != null)
@@ -87,9 +82,13 @@ namespace CoreGameplay
             var o = Instantiate(obj);
             o.GetComponent<RectTransform>().SetParent(boardParent);
             var no = o.GetComponent<NodeObject>();
-            no.MoveToPosition(new Vector2Int(x, y));
+            no.MoveToPosition(new Vector2Int(x, y) , true);
             no.SetBoard(this);
             _board[x, y] = no;
         }
+        
+        private void VerifyBoard(){}
+        
+        
     }
 }

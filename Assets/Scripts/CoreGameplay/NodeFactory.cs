@@ -45,7 +45,6 @@ namespace CoreGameplay
             };
         }
         
-
         public static NodeFactory Instance;
 
         private void Awake()

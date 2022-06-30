@@ -90,6 +90,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 151001680800665316}
   gap: 110
-  longTime: 2
+  longTime: 1
   shortTime: 0.25
   color: 5

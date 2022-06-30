@@ -23,17 +23,27 @@ namespace CoreGameplay
             _indexedPosition = new Vector2Int(-100,-100);
         }
 
-        public void MoveToPosition(Vector2Int index)
+        public void MoveToPosition(Vector2Int index , bool useLongTime)
         {
             if(index == _indexedPosition) return;
             _indexedPosition = index;
-            rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), shortTime , true).SetEase(Ease.InQuad);
+            if (useLongTime)
+            {
+                rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), longTime , true).SetEase(Ease.InQuad);    
+            }
+            else
+            {
+                rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), shortTime , true).SetEase(Ease.InQuad);
+            }
+            
         }
 
         public void SetBoard(NodeBoard board)
         {
             _board = board;
         }
+
+        public NodeColor GetColor() => color;
 
     }
 }

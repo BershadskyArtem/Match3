@@ -89,6 +89,7 @@ namespace CoreGameplay
             var no = o.GetComponent<NodeObject>();
             no.MoveToPosition(new Vector2Int(x, y));
             no.SetBoard(this);
+            _board[x, y] = no;
         }
     }
 }

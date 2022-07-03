@@ -24,8 +24,8 @@ namespace CoreGameplay
             _boardProvider = new RandomBoardProvider();
             _matchDiagnoser = new MatchDiagnoser()
                 .AddMatchRule(new CrossMatchRule())
-                .AddMatchRule(new HorizontalMatchRule())
-                .AddMatchRule(new VerticalMatchRule());
+            .AddMatchRule(new HorizontalMatchRule())
+            .AddMatchRule(new VerticalMatchRule());
         }
 
         public void ResetBoard()
@@ -117,7 +117,6 @@ namespace CoreGameplay
 
         private void VerifyBoard()
         {
-            
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
             Debug.Log($"Verified = {matches.Count()}");
             foreach (var match in matches)
@@ -135,9 +134,10 @@ namespace CoreGameplay
             
             var n1 = _board[pos1.x , pos1.y];
             var n2 = _board[pos2.x , pos2.y];
-            
-            if(!n1.GetSwappable().CanSwap() || !n2.GetSwappable().CanSwap()) return;
-            if(!n1.GetMatchable().CanMatch() || !n2.GetMatchable().CanMatch()) return;
+
+           
+            if (n1.GetSwappable().CanSwap() == false || n2.GetSwappable().CanSwap() == false) return;
+            if (n1.GetMatchable().CanMatch() == false || n2.GetMatchable().CanMatch() == false) return;
             
             SwipeTwoNodes(pos1 , pos2);
 

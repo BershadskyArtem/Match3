@@ -94,7 +94,9 @@ MonoBehaviour:
   gap: 110
   longTime: 1
   shortTime: 0.25
+  isMatchable: 1
   color: 3
+  isSwappable: 1
 --- !u!114 &5856568693918099789
 MonoBehaviour:
   m_ObjectHideFlags: 0

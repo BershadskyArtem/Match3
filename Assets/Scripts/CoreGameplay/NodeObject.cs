@@ -17,9 +17,9 @@ namespace CoreGameplay
         [SerializeField] private float shortTime;
         
         [Header("Node Properties")] 
-        [SerializeField] private bool isMatchable = true;
+        [SerializeField] private bool isMatchable;
         [SerializeField] private NodeColor color;
-        [SerializeField] private bool isSwappable = true;
+        [SerializeField] private bool isSwappable;
         
         private Vector2Int _indexedPosition;
         private NodeBoard _board;
@@ -31,7 +31,7 @@ namespace CoreGameplay
             _indexedPosition = new Vector2Int(-100,-100);
             _control.OnSwipe += HandleSwiping;
             _matchable = new MatchProperty(color , isMatchable);
-            _swappable = isSwappable ? SwappableProperty.AlwaysTrue : SwappableProperty.AlwaysFalse;
+            _swappable = new SwappableProperty(isSwappable);
         }
 
         public void MoveToPosition(Vector2Int index , bool useLongTime)

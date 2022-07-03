@@ -1,5 +1,6 @@
 using System;
 using CoreGameplay.Kinds;
+using CoreGameplay.Matches;
 using DG.Tweening;
 using UnityEngine;
 
@@ -14,15 +15,23 @@ namespace CoreGameplay
         [SerializeField] private float gap;
         [SerializeField] private float longTime;
         [SerializeField] private float shortTime;
+        
+        [Header("Node Properties")] 
+        [SerializeField] private bool isMatchable = true;
         [SerializeField] private NodeColor color;
-
+        [SerializeField] private bool isSwappable = true;
+        
         private Vector2Int _indexedPosition;
         private NodeBoard _board;
+        private IMatchable _matchable;
+        private ISwappable _swappable;
 
         private void Awake()
         {
             _indexedPosition = new Vector2Int(-100,-100);
             _control.OnSwipe += HandleSwiping;
+            _matchable = new MatchProperty(color , isMatchable);
+            _swappable = isSwappable ? SwappableProperty.AlwaysTrue : SwappableProperty.AlwaysFalse;
         }
 
         public void MoveToPosition(Vector2Int index , bool useLongTime)
@@ -37,8 +46,10 @@ namespace CoreGameplay
             {
                 rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), shortTime , true).SetEase(Ease.InQuad);
             }
-            
         }
+
+        public ISwappable GetSwappable() => _swappable;
+        public IMatchable GetMatchable() => _matchable;
 
         public void SetBoard(NodeBoard board)
         {

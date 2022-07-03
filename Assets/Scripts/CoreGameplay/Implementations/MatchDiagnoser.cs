@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CoreGameplay.Base;
+using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using UnityEngine;
 
@@ -50,9 +51,13 @@ namespace CoreGameplay.Implementations
 
         public Match GetMatchAtPoint(NodeObject[,] board, int xPos, int yPos)
         {
+            var pos = new Vector2Int(xPos , yPos);
+            var nodeColor = board[xPos, yPos].GetColor();
+            if(nodeColor == NodeColor.Unknown) return Match.Zero;
+            
             foreach (var matchRule in _matchRules)
             {
-                var m = new Match(new Vector2Int(xPos , yPos) , board[xPos , yPos].GetColor());
+                var m = new Match(pos, nodeColor);
                 if (matchRule.TryGetMatchAtPoint(board, xPos , yPos, ref m))
                 {
                     return m;

@@ -133,6 +133,12 @@ namespace CoreGameplay
         {
             if(!IsInsideBoard(pos1) || !IsInsideBoard(pos2)) return;
             
+            var n1 = _board[pos1.x , pos1.y];
+            var n2 = _board[pos2.x , pos2.y];
+            
+            if(!n1.GetSwappable().CanSwap() || !n2.GetSwappable().CanSwap()) return;
+            if(!n1.GetMatchable().CanMatch() || !n2.GetMatchable().CanMatch()) return;
+            
             SwipeTwoNodes(pos1 , pos2);
 
             var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);

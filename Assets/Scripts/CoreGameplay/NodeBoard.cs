@@ -86,6 +86,7 @@ namespace CoreGameplay
         private void Start()
         {
             StartCoroutine(nameof(ApplyGravityContinious));
+            StartCoroutine(nameof(CheckMatches));
         }
 
         public void LoadBoard()
@@ -180,28 +181,22 @@ namespace CoreGameplay
             while (true)
             {
                 _gravityProvider.ApplyGravity(this);
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
-        private IEnumerator ApplyGravity()
+        private IEnumerator CheckMatches()
         {
-            bool s = true;
+            while (true)
+            {
+                var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
 
-            if (s)
-            {
-                s = false;
-                yield return new WaitForSeconds(0.5f);
-            }
-            var i = _gravityProvider.ApplyGravity(this);
-            while( i > 0)
-            {
-                var ms =_matchDiagnoser.GetMatchesFromBoard(_board);
-                foreach (var match in ms)
+                foreach (var match in matches)
                 {
                     DestroyMatch(match);
                 }
-                i = _gravityProvider.ApplyGravity(this);
+                
+                yield return new WaitForSeconds(0.2f);
             }
         }
 

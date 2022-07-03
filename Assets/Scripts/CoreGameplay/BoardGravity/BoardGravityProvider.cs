@@ -13,6 +13,7 @@ namespace CoreGameplay.BoardGravity
         public int ApplyGravity(NodeBoard nodeBoard)
         {
             var board = nodeBoard.GetBoard();
+            if (board == null) return 0;
             int width = board.GetLength(0);
             int height = board.GetLength(1);
             int counter = 0;

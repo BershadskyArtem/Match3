@@ -19,6 +19,8 @@ namespace CoreGameplay.Implementations
         
         public IEnumerable<Match> GetMatchesFromBoard(NodeObject[,] board)
         {
+            if (board == null) return new List<Match>();
+            
             int width = board.GetLength(0);
             int height = board.GetLength(1);
             
@@ -31,6 +33,9 @@ namespace CoreGameplay.Implementations
                 for (int y = 0; y < height; y++)
                 {
                     if(_matchedMap[x,y]) continue;
+                    
+                    if(board[x,y] == null) continue;
+                    
                     foreach (var matchRule in _matchRules)
                     {
                         var m = new Match(new Vector2Int(x , y) , board[x,y].GetColor());

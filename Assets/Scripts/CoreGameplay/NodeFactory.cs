@@ -13,6 +13,9 @@ namespace CoreGameplay
         [SerializeField] private GameObject yellowNodePrefab;
         [SerializeField] private GameObject blueNodePrefab;
         [SerializeField] private GameObject unknownNodePrefab;
+
+        [Header("Effects prefabs")] 
+        [SerializeField] private GameObject destroyPrefab;
         
         public GameObject GetPrefab(NodeColor color)
         {
@@ -43,6 +46,11 @@ namespace CoreGameplay
                 NodeColor.Blue => GetPrefab(NodeColor.Yellow),
                 _ => unknownNodePrefab
             };
+        }
+
+        public GameObject GetDestroyPrefab()
+        {
+            return destroyPrefab;
         }
         
         public static NodeFactory Instance;

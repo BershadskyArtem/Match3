@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using DG.Tweening;
@@ -77,5 +78,48 @@ namespace CoreGameplay
             }
         }
 
+        public void DestroyNode()
+        {
+            try
+            {
+                StartCoroutine(nameof(DestoryEffect));
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            
+        }
+        
+        private IEnumerator DestoryEffect()
+        {
+
+            if (this.gameObject == null) yield break;
+            
+            bool s = true;
+            bool n = true;
+            if (s)
+            {
+                s = false;
+                yield return new WaitForSeconds(0.1f);
+            }
+            
+            var ef = Instantiate(NodeFactory.Instance.GetDestroyPrefab(), rect.parent);
+            Vector2 vec = _indexedPosition;
+            vec.x *= gap;
+            vec.y *= gap;
+            ef.GetComponent<RectTransform>().anchoredPosition = vec;
+
+            if (n)
+            {
+                n = false;
+                yield return new WaitForSeconds(0.1f);
+            }            
+            if(this.gameObject != null)
+                Destroy(this.gameObject);
+           
+            yield return null;
+        }
+        
     }
 }

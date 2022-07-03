@@ -291,7 +291,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.8867924, g: 0.8867924, b: 0.8867924, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -457,6 +457,7 @@ MonoBehaviour:
   yellowNodePrefab: {fileID: 2765199525854627963, guid: 95fb483bc5b15d34d9bee23adcf21c23, type: 3}
   blueNodePrefab: {fileID: 7687081735098502892, guid: 0ff26a7a3a5717c4aa4c78cde50e65bb, type: 3}
   unknownNodePrefab: {fileID: 151001680800665317, guid: 8e0055d1c5380524f8117db844929fa7, type: 3}
+  destroyPrefab: {fileID: 5767455352990646772, guid: bf113b7c7326d004d9c594442109e1bb, type: 3}
 --- !u!1 &965705892
 GameObject:
   m_ObjectHideFlags: 0

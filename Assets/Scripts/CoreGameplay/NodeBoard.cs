@@ -228,7 +228,7 @@ namespace CoreGameplay
         private void DestroyNode(int x , int y)
         {
             if(!IsInsideBoard(x,y)) return;
-            _board[x,y].DestroyNode();
+            _board[x,y]?.DestroyNode();
         }
         
     }

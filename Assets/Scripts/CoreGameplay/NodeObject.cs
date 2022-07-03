@@ -80,6 +80,9 @@ namespace CoreGameplay
 
         public void DestroyNode()
         {
+
+            if (this == null || this.gameObject == null) return;
+            
             try
             {
                 StartCoroutine(nameof(DestoryEffect));

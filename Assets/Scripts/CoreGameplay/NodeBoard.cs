@@ -31,13 +31,10 @@ namespace CoreGameplay
                 .AddMatchRule(new CrossMatchRule())
                 .AddMatchRule(new HorizontalMatchRule())
                 .AddMatchRule(new VerticalMatchRule());
-            
         }
 
         #region Done
-
         
-
       
         public NodeObject[,] GetBoard()
         {
@@ -103,8 +100,6 @@ namespace CoreGameplay
             VerifyBoard();
             VerifyBoard();
             VerifyBoard();
-            VerifyBoard();
-            VerifyBoard();
             ForeachNode(_board , (board, x, y) =>
             {
                 MoveNodeToCoord(board[x, y], x, y);
@@ -146,6 +141,8 @@ namespace CoreGameplay
             }
         }
 
+        #endregion
+        
         public void TrySwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
         {
             if(!IsInsideBoard(pos1) || !IsInsideBoard(pos2)) return;
@@ -165,78 +162,56 @@ namespace CoreGameplay
 
             if (!Match.isZero(pm1))
             {
-                Debug.Log("SF11");
                 DestroyMatch(pm1);
             }
             if (!Match.isZero(pm2))
             {
-                Debug.Log("SF11");
-                
                 DestroyMatch(pm2);
             }
 
             if (!Match.isZero(pm1) || !Match.isZero(pm2))
             {
                 ApplyGravity();
+                return;
             }
             SwipeTwoNodes(pos1 , pos2);
         }
-        
-        #endregion
-        
-        
+
         private void ApplyGravity()
         {
-           var counter = _gravityProvider.ApplyGravity(this);
-           Debug.Log($"Gravity applied to {counter} objects");
-           int stop = counter > 0 ? 1 : 0;
-           while (counter > 0 && stop < 10)
-           {
-               Debug.Log($"Gravity applied to {counter} objects");
-               counter = _gravityProvider.ApplyGravity(this);
-               stop++;
-           }
-           if (stop > 0)
-           {
-               CheckMatches();
-           }
-           
+            var counter = _gravityProvider.ApplyGravity(this);
+            Debug.Log($"Gravity applied to {counter} objects");
+            var appliedCounter = 0;
+            while (counter > 0)
+            {
+                counter = _gravityProvider.ApplyGravity(this);
+                Debug.Log($"Gravity applied to {counter} objects");
+                appliedCounter++;
+            }
+
+            if (appliedCounter > 0)
+            {
+                CheckBoard();
+            }
+            
         }
 
-        private void CheckMatches()
+        private void CheckBoard()
         {
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
-            Debug.Log($"{matches.Count()} matches found.");
+
             foreach (var match in matches)
             {
                 DestroyMatch(match);
             }
-            ApplyGravity();
-        }
 
-        private IEnumerator ApplyGravityContinious()
-        {
-            while (true)
+            if (matches.Count() > 0)
             {
-                _gravityProvider.ApplyGravity(this);
-                yield return new WaitForSeconds(0.1f);
+                ApplyGravity();
             }
+            
         }
-
-        private IEnumerator CheckMatchesContinious()
-        {
-            while (true)
-            {
-                var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
-
-                foreach (var match in matches)
-                {
-                    DestroyMatch(match);
-                }
-                
-                yield return new WaitForSeconds(0.2f);
-            }
-        }
+        
 
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x , pos.y);
         public bool IsInsideBoard(int x , int y)
@@ -267,17 +242,7 @@ namespace CoreGameplay
             _board[x, y] = null;
         }
 
-        private void CheckInternalBoard()
-        {
-            ForeachNode(_board, (nodes, x, y) =>
-            {
-                var n = nodes[x, y];
-                if (n.GetPos() != new Vector2Int(x, y))
-                {
-                    n.MoveToPosition(new Vector2Int(x,y) , false);
-                }
-            });
-        }
+       
         
     }
 }

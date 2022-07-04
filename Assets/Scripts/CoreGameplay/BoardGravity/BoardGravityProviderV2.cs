@@ -20,37 +20,19 @@ namespace CoreGameplay.BoardGravity
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if(board[x,y] != null) continue;
-                    var pos = new Vector2Int(x, y);
-                    var upp = pos + _up;
-                    var leftp = pos + _upLeft;
-                    var rightp = pos + _upRight;
-
-
-                    if(y + 1 < height)
-                        for (int i = y + 1; i < height; i++)
-                        {
-                            if (board[x, i] == null) continue;
-                            
-                            nodeBoard.SwipeTwoNodes(pos,new Vector2Int(x,i));
-                            counter++;
-                            break;
-                        }
-                    
-                    
-                    
-                    if (nodeBoard.IsInsideBoard(leftp) && board[leftp.x, leftp.y] != null)
+                    if (board[x, y] != null) continue;
+                    Vector2Int pos = new Vector2Int(x,y);
+                    bool up = false;
+                    for (int i = y + 1; i < height; i++)
                     {
-                        nodeBoard.SwipeTwoNodes(pos , leftp);
+                        if (board[x, i] == null) continue;
+                        nodeBoard.SwipeTwoNodes(pos , pos + Vector2Int.up);
                         counter++;
-                        continue;
+                        up = true;
+                        break;
                     }
-                    if (nodeBoard.IsInsideBoard(rightp) && board[rightp.x, rightp.y] != null)
-                    {
-                        nodeBoard.SwipeTwoNodes(rightp , rightp);
-                        counter++;
-                        continue;
-                    }
+                    //if (up) continue;
+                    
                 }
             }
 

@@ -3,6 +3,7 @@ using System.Collections;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 
 namespace CoreGameplay
@@ -27,12 +28,19 @@ namespace CoreGameplay
         private IMatchable _matchable;
         private ISwappable _swappable;
 
+        public Vector2Int GetPos()
+        {
+            return _indexedPosition;
+        }
+
+        [SerializeField] private TextMeshProUGUI text;
         private void Awake()
         {
             _indexedPosition = new Vector2Int(-100,-100);
             _control.OnSwipe += HandleSwiping;
             _matchable = new MatchProperty(color , isMatchable);
             _swappable = new SwappableProperty(isSwappable);
+           
         }
 
         public void MoveToPosition(Vector2Int index , bool useLongTime)
@@ -47,6 +55,8 @@ namespace CoreGameplay
             {
                 rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), shortTime , true).SetEase(Ease.InQuad);
             }
+
+            text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
         }
 
         public ISwappable GetSwappable() => _swappable;

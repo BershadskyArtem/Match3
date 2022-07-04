@@ -15,6 +15,7 @@ namespace CoreGameplay.Matches.Rules
             //bottom to the top
             for (int y = yPos; y < height; y++)
             {
+                if(board[xPos, y] == null) break;
                 var swap2 = board[xPos, y].GetMatchable();
                 if (!swap2.CanMatch()) break;
                 if (swap2.GetID() != id) break;
@@ -24,6 +25,7 @@ namespace CoreGameplay.Matches.Rules
             //from the top
             for (int y = yPos; y >= 0; y--)
             {
+                if(board[xPos, y] == null) break;
                 var swap2 = board[xPos, y].GetMatchable();
                 if (!swap2.CanMatch()) break;
                 if (swap2.GetID() != id) break;

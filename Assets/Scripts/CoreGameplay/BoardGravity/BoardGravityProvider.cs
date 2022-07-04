@@ -32,8 +32,7 @@ namespace CoreGameplay.BoardGravity
                     
                     //var dd = pos + _down;
                     Vector2Int dd = pos;
-                    int c = 0;
-                    for (int i = y - 1; i > 0; i--)
+                    for (int i = y - 1; i >= 0; i--)
                     {
                         if ( !(nodeBoard.IsInsideBoard(dr) && board[x, i] == null)) break;
                         dd += _down;

@@ -26,7 +26,7 @@ namespace CoreGameplay
         public NodeBoard()
         {
             _boardProvider = new RandomBoardProvider();
-            _gravityProvider = new BoardGravityProvider();
+            _gravityProvider = new BoardGravityProviderV2();
             _matchDiagnoser = new MatchDiagnoser()
                 .AddMatchRule(new CrossMatchRule())
                 .AddMatchRule(new HorizontalMatchRule())
@@ -34,6 +34,11 @@ namespace CoreGameplay
             
         }
 
+        #region Done
+
+        
+
+      
         public NodeObject[,] GetBoard()
         {
             return _board;
@@ -85,12 +90,6 @@ namespace CoreGameplay
             }
         }
 
-        private void Start()
-        {
-            //StartCoroutine(nameof(ApplyGravityContinious));
-            //StartCoroutine(nameof(CheckMatches));
-        }
-
         public void LoadBoard()
         {
             ResetBoard();
@@ -99,6 +98,9 @@ namespace CoreGameplay
             {
                 InstantiateNode(nodeObject , x , y);
             } );
+            VerifyBoard();
+            VerifyBoard();
+            VerifyBoard();
             VerifyBoard();
             VerifyBoard();
             VerifyBoard();
@@ -179,12 +181,22 @@ namespace CoreGameplay
             }
             SwipeTwoNodes(pos1 , pos2);
         }
-
+        
+        #endregion
+        
+        
         private void ApplyGravity()
         {
            var counter = _gravityProvider.ApplyGravity(this);
            Debug.Log($"Gravity applied to {counter} objects");
-           if (counter > 0)
+           int stop = counter > 0 ? 1 : 0;
+           while (counter > 0 && stop < 10)
+           {
+               Debug.Log($"Gravity applied to {counter} objects");
+               counter = _gravityProvider.ApplyGravity(this);
+               stop++;
+           }
+           if (stop > 0)
            {
                CheckMatches();
            }
@@ -199,10 +211,7 @@ namespace CoreGameplay
             {
                 DestroyMatch(match);
             }
-            if (matches.Count() > 0)
-            {
-                ApplyGravity();
-            }
+            ApplyGravity();
         }
 
         private IEnumerator ApplyGravityContinious()
@@ -237,12 +246,11 @@ namespace CoreGameplay
         public void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
         {
             //swipe visuals
-            _board[pos1.x, pos1.y].MoveToPosition(pos2 , false);
-            _board[pos2.x, pos2.y].MoveToPosition(pos1 , false);
+            _board[pos1.x, pos1.y]?.MoveToPosition(pos2 , false);
+            _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , false);
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
-            
         }
         private void DestroyMatch(Match match)
         {
@@ -256,7 +264,19 @@ namespace CoreGameplay
         {
             if(!IsInsideBoard(x,y)) return;
             _board[x,y]?.DestroyNode();
-           
+            _board[x, y] = null;
+        }
+
+        private void CheckInternalBoard()
+        {
+            ForeachNode(_board, (nodes, x, y) =>
+            {
+                var n = nodes[x, y];
+                if (n.GetPos() != new Vector2Int(x, y))
+                {
+                    n.MoveToPosition(new Vector2Int(x,y) , false);
+                }
+            });
         }
         
     }

@@ -6,6 +6,7 @@ using CoreGameplay.BoardGravity;
 using CoreGameplay.Implementations;
 using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace CoreGameplay
@@ -25,11 +26,12 @@ namespace CoreGameplay
         public NodeBoard()
         {
             _boardProvider = new RandomBoardProvider();
+            _gravityProvider = new BoardGravityProvider();
             _matchDiagnoser = new MatchDiagnoser()
                 .AddMatchRule(new CrossMatchRule())
-            .AddMatchRule(new HorizontalMatchRule())
-            .AddMatchRule(new VerticalMatchRule());
-            _gravityProvider = new BoardGravityProvider();
+                .AddMatchRule(new HorizontalMatchRule())
+                .AddMatchRule(new VerticalMatchRule());
+            
         }
 
         public NodeObject[,] GetBoard()
@@ -85,8 +87,8 @@ namespace CoreGameplay
 
         private void Start()
         {
-            StartCoroutine(nameof(ApplyGravityContinious));
-            StartCoroutine(nameof(CheckMatches));
+            //StartCoroutine(nameof(ApplyGravityContinious));
+            //StartCoroutine(nameof(CheckMatches));
         }
 
         public void LoadBoard()
@@ -97,6 +99,7 @@ namespace CoreGameplay
             {
                 InstantiateNode(nodeObject , x , y);
             } );
+            VerifyBoard();
             VerifyBoard();
             VerifyBoard();
             VerifyBoard();
@@ -170,10 +173,36 @@ namespace CoreGameplay
                 DestroyMatch(pm2);
             }
 
-           // StartCoroutine(nameof(ApplyGravity));
-            
-            if(!Match.isZero(pm1) || !Match.isZero(pm2)) return;
+            if (!Match.isZero(pm1) || !Match.isZero(pm2))
+            {
+                ApplyGravity();
+            }
             SwipeTwoNodes(pos1 , pos2);
+        }
+
+        private void ApplyGravity()
+        {
+           var counter = _gravityProvider.ApplyGravity(this);
+           Debug.Log($"Gravity applied to {counter} objects");
+           if (counter > 0)
+           {
+               CheckMatches();
+           }
+           
+        }
+
+        private void CheckMatches()
+        {
+            var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
+            Debug.Log($"{matches.Count()} matches found.");
+            foreach (var match in matches)
+            {
+                DestroyMatch(match);
+            }
+            if (matches.Count() > 0)
+            {
+                ApplyGravity();
+            }
         }
 
         private IEnumerator ApplyGravityContinious()
@@ -185,7 +214,7 @@ namespace CoreGameplay
             }
         }
 
-        private IEnumerator CheckMatches()
+        private IEnumerator CheckMatchesContinious()
         {
             while (true)
             {
@@ -215,7 +244,6 @@ namespace CoreGameplay
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
             
         }
-
         private void DestroyMatch(Match match)
         {
             var poss = match.Positions;
@@ -224,11 +252,11 @@ namespace CoreGameplay
                 DestroyNode(pos.x , pos.y);
             }
         }
-
         private void DestroyNode(int x , int y)
         {
             if(!IsInsideBoard(x,y)) return;
             _board[x,y]?.DestroyNode();
+           
         }
         
     }

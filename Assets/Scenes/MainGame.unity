@@ -304,11 +304,92 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CheckDelay: 0.2
-  GravityDelay: 0.25
+  GravityDelay: 0.33
   Gap: 110
   SwapTime: 0.15
-  FallTime: 1.5
-  DeathScaleTime: 0.5
+  FallTime: 0.2
+  DeathScaleTime: 0.3
+  FallCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.7329431
+      value: 0.9439075
+      inSlope: 1.4932729
+      outSlope: 1.4932729
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.8074724
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: -3.622208
+      outSlope: -3.622208
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11411099
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  DestroyCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2.7673323
+      outSlope: 2.7673323
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.041760802
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SwapCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -1.0730495
+      outSlope: -1.0730495
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.04176072
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: -1.0030175
+      outSlope: -1.0030175
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.0564335
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

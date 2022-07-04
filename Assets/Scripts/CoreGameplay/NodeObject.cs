@@ -29,7 +29,7 @@ namespace CoreGameplay
         [SerializeField] private TextMeshProUGUI text;
         private void Awake()
         {
-            _indexedPosition = new Vector2Int(-100,-100);
+            _indexedPosition = new Vector2Int(-1,-1);
             _control.OnSwipe += HandleSwiping;
             _matchable = new MatchProperty(color , isMatchable);
             _swappable = new SwappableProperty(isSwappable);
@@ -39,16 +39,19 @@ namespace CoreGameplay
         public void MoveToPosition(Vector2Int index , bool useLongTime)
         {
             if(index == _indexedPosition) return;
+            var diff = index.y - _indexedPosition.y;
             _indexedPosition = index;
+            
+            Debug.Log(AnimationNumbers.Instance.FallTime * Mathf.Abs(diff));
             if (useLongTime)
             {
                 rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
-                    AnimationNumbers.Instance.FallTime , true).SetEase(Ease.InQuad);    
+                    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff) , true).SetEase(AnimationNumbers.Instance.FallCurve);    
             }
             else
             {
                 rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
-                    AnimationNumbers.Instance.SwapTime , true).SetEase(Ease.InQuad);   
+                    AnimationNumbers.Instance.SwapTime , true).SetEase(AnimationNumbers.Instance.SwapCurve);   
             }
 
             text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
@@ -117,7 +120,7 @@ namespace CoreGameplay
             vec.x *= AnimationNumbers.Instance.Gap;
             vec.y *= AnimationNumbers.Instance.Gap;
             ef.GetComponent<RectTransform>().anchoredPosition = vec;
-            this.rect.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime);
+            this.rect.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime).SetEase(AnimationNumbers.Instance.DestroyCurve);
 
             if (n)
             {

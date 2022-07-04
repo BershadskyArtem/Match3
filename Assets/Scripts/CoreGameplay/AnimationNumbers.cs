@@ -13,6 +13,9 @@ namespace CoreGameplay
         public float SwapTime;
         public float FallTime;
         public float DeathScaleTime;
+        public AnimationCurve FallCurve;
+        public AnimationCurve DestroyCurve;
+        public AnimationCurve SwapCurve;
         private void Awake()
         {
             Instance = this;

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using CoreGameplay.Base;
 using CoreGameplay.BoardGravity;
 using CoreGameplay.Implementations;
 using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace CoreGameplay
@@ -220,11 +218,11 @@ namespace CoreGameplay
         {
             return x >= 0 && x < width && y >= 0 && y < height;
         }
-        public void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
+        public void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2 , bool useGravityTime = false)
         {
             //swipe visuals
-            _board[pos1.x, pos1.y]?.MoveToPosition(pos2 , false);
-            _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , false);
+            _board[pos1.x, pos1.y]?.MoveToPosition(pos2 , useGravityTime);
+            _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , useGravityTime);
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);

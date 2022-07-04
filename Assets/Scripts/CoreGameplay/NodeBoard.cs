@@ -17,11 +17,13 @@ namespace CoreGameplay
         [SerializeField] private int width;
         [SerializeField] private int height;
         [SerializeField] private RectTransform boardParent;
+        
         private NodeObject[,] _board;
         
         private readonly IBoardProvider _boardProvider;
         private readonly IMatchDiagnoser _matchDiagnoser;
         private readonly IBoardGravityProvider _gravityProvider;
+        
         
         public NodeBoard()
         {
@@ -47,7 +49,7 @@ namespace CoreGameplay
             {
                 ForeachNode(_board , (node) =>
                 {
-                    Destroy(node.gameObject);
+                    Destroy(node?.gameObject);
                 });
             }
 
@@ -171,7 +173,7 @@ namespace CoreGameplay
 
             if (!Match.isZero(pm1) || !Match.isZero(pm2))
             {
-                ApplyGravity();
+                Invoke(nameof(ApplyGravity),AnimationNumbers.Instance.GravityDelay); 
                 return;
             }
             SwipeTwoNodes(pos1 , pos2);
@@ -191,7 +193,7 @@ namespace CoreGameplay
 
             if (appliedCounter > 0)
             {
-                CheckBoard();
+                Invoke(nameof(CheckBoard),AnimationNumbers.Instance.CheckDelay); 
             }
             
         }
@@ -207,7 +209,7 @@ namespace CoreGameplay
 
             if (matches.Count() > 0)
             {
-                ApplyGravity();
+                Invoke(nameof(ApplyGravity) , AnimationNumbers.Instance.GravityDelay);
             }
             
         }
@@ -226,6 +228,7 @@ namespace CoreGameplay
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
+            Debug.Log($"Swiped {pos1} / {pos2}");
         }
         private void DestroyMatch(Match match)
         {

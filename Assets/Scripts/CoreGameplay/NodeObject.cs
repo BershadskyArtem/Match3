@@ -14,9 +14,7 @@ namespace CoreGameplay
         [Header("Components")] 
         [SerializeField] private RectTransform rect;
         [SerializeField] private NodeControl _control;
-        [SerializeField] private float gap;
-        [SerializeField] private float longTime;
-        [SerializeField] private float shortTime;
+        
         
         [Header("Node Properties")] 
         [SerializeField] private bool isMatchable;
@@ -27,11 +25,6 @@ namespace CoreGameplay
         private NodeBoard _board;
         private IMatchable _matchable;
         private ISwappable _swappable;
-
-        public Vector2Int GetPos()
-        {
-            return _indexedPosition;
-        }
 
         [SerializeField] private TextMeshProUGUI text;
         private void Awake()
@@ -49,11 +42,13 @@ namespace CoreGameplay
             _indexedPosition = index;
             if (useLongTime)
             {
-                rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), longTime , true).SetEase(Ease.InQuad);    
+                rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
+                    AnimationNumbers.Instance.FallTime , true).SetEase(Ease.InQuad);    
             }
             else
             {
-                rect.DOAnchorPos(new Vector2(index.x * gap, index.y * gap), shortTime , true).SetEase(Ease.InQuad);
+                rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
+                    AnimationNumbers.Instance.SwapTime , true).SetEase(Ease.InQuad);   
             }
 
             text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
@@ -119,14 +114,15 @@ namespace CoreGameplay
             
             var ef = Instantiate(NodeFactory.Instance.GetDestroyPrefab(), rect.parent);
             Vector2 vec = _indexedPosition;
-            vec.x *= gap;
-            vec.y *= gap;
+            vec.x *= AnimationNumbers.Instance.Gap;
+            vec.y *= AnimationNumbers.Instance.Gap;
             ef.GetComponent<RectTransform>().anchoredPosition = vec;
+            this.rect.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime);
 
             if (n)
             {
                 n = false;
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds( AnimationNumbers.Instance.DeathScaleTime + 0.1f);
             }            
             if(this.gameObject != null)
                 Destroy(this.gameObject);

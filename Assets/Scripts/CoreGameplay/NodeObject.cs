@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace CoreGameplay
 {
-    [RequireComponent(typeof(RectTransform))]
+    //[RequireComponent(typeof(RectTransform))]
     public class NodeObject : MonoBehaviour
     {
         [Header("Components")] 
         [SerializeField] private RectTransform rect;
         [SerializeField] private NodeControl _control;
-        
+        [SerializeField] private Transform transform;
         
         [Header("Node Properties")] 
         [SerializeField] private bool isMatchable;
@@ -42,16 +42,23 @@ namespace CoreGameplay
             var diff = index.y - _indexedPosition.y;
             _indexedPosition = index;
             
-            Debug.Log(AnimationNumbers.Instance.FallTime * Mathf.Abs(diff));
+            //Debug.Log(AnimationNumbers.Instance.FallTime * Mathf.Abs(diff));
             if (useLongTime)
             {
-                rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
-                    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff) , true).SetEase(AnimationNumbers.Instance.FallCurve);    
+                //rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
+                //    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff) , true).SetEase(AnimationNumbers.Instance.FallCurve); 
+                transform.DOLocalMove(new Vector2((float)index.x * AnimationNumbers.Instance.Gap, (float)index.y * AnimationNumbers.Instance.Gap), 
+                    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff)).SetEase(AnimationNumbers.Instance.FallCurve); 
+                
             }
             else
             {
-                rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
-                    AnimationNumbers.Instance.SwapTime , true).SetEase(AnimationNumbers.Instance.SwapCurve);   
+                //rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
+                //    AnimationNumbers.Instance.SwapTime , true).SetEase(AnimationNumbers.Instance.SwapCurve);   
+                float x = (float) index.x * AnimationNumbers.Instance.Gap;
+                float y = (float) index.y * AnimationNumbers.Instance.Gap;
+                transform.DOLocalMove(new Vector2(x,y), 
+                    AnimationNumbers.Instance.SwapTime).SetEase(AnimationNumbers.Instance.SwapCurve);   
             }
 
             //text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
@@ -88,7 +95,7 @@ namespace CoreGameplay
 
         public void DestroyNode()
         {
-
+            return;
             if (this == null || this.gameObject == null) return;
             
             try
@@ -104,7 +111,7 @@ namespace CoreGameplay
         
         private IEnumerator DestoryEffect()
         {
-
+           
             if (this.gameObject == null) yield break;
             
             bool s = true;

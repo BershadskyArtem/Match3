@@ -15,6 +15,7 @@ namespace CoreGameplay
         [SerializeField] private int width;
         [SerializeField] private int height;
         [SerializeField] private RectTransform boardParent;
+        [SerializeField] private Transform boardTransformParent;
         
         private NodeObject[,] _board;
         private readonly IBoardProvider _boardProvider;
@@ -109,7 +110,8 @@ namespace CoreGameplay
             if (obj == null) throw new NullReferenceException("Prefab is null");
 
             var o = Instantiate(obj);
-            o.GetComponent<RectTransform>().SetParent(boardParent , false);
+            //o.GetComponent<RectTransform>().SetParent(boardParent , false);
+            o.GetComponent<Transform>().SetParent(boardTransformParent , false);
             var no = o.GetComponent<NodeObject>();
             no.SetBoard(this);
             _board[x, y] = no;
@@ -174,7 +176,6 @@ namespace CoreGameplay
             }
             SwipeTwoNodes(pos1 , pos2);
         }
-
         private void ApplyGravity()
         {
             var counter = _gravityProvider.ApplyGravity(this);
@@ -193,7 +194,6 @@ namespace CoreGameplay
             }
             
         }
-
         private void CheckBoard()
         {
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
@@ -209,7 +209,6 @@ namespace CoreGameplay
             }
             
         }
-        
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x , pos.y);
         public bool IsInsideBoard(int x , int y)
         {

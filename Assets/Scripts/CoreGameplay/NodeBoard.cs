@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CoreGameplay.Base;
 using CoreGameplay.BoardGravity;
@@ -250,6 +251,8 @@ namespace CoreGameplay
 
         private void ExplodeRegion(int radius , Vector2Int origin)
         {
+            List<NodeObject> otherBombs = new List<NodeObject>();
+            DestroyNode(origin.x , origin.y);
             ForeachNode(_board, (node , x , y) =>
             {
                 var l = Mathf.Sqrt(Mathf.Pow((x - origin.x), 2) + Mathf.Pow((y - origin.y), 2));

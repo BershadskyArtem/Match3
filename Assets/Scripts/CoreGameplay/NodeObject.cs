@@ -20,6 +20,8 @@ namespace CoreGameplay
         [SerializeField] private bool isMatchable;
         [SerializeField] private NodeColor color;
         [SerializeField] private bool isSwappable;
+        [SerializeField] private bool isBomb;
+        [SerializeField] private int bombRank;
         
         private Vector2Int _indexedPosition;
         private NodeBoard _board;
@@ -31,6 +33,9 @@ namespace CoreGameplay
         {
             get => _indexedPosition;
         }
+
+        public bool IsBomb => isBomb;
+        public int BombRank => bombRank;
 
         private void Awake()
         {
@@ -101,7 +106,12 @@ namespace CoreGameplay
         public void DestroyNode()
         {
             if (this == null || this.gameObject == null) return;
-            Destroy(this.gameObject);
+            this.gameObject.transform.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime)
+                .SetEase(AnimationNumbers.Instance.DestroyCurve).onComplete += () =>
+            {
+                Destroy(this.gameObject);
+            };
+            Destroy(this);
             return;
             try
             {

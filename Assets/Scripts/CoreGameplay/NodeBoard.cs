@@ -6,7 +6,6 @@ using CoreGameplay.Implementations;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
-using Lean.Touch;
 using UnityEngine;
 
 namespace CoreGameplay
@@ -56,11 +55,7 @@ namespace CoreGameplay
            // Lean.Touch.LeanTouch.OnFingerSwipe -= HandleSwipesT;
         }
 
-        private void HandleSwipesT(LeanFinger leanFinger)
-        {
-            //Debug.LogError(leanFinger.SwipeScaledDelta);
-        }
-
+      
         private void HandleSwipes(Direction direction)
         {
             //Debug.Log(direction);
@@ -211,11 +206,28 @@ namespace CoreGameplay
 
             if(n1 == null || n2 == null) return;
             
-            if (n1.GetSwappable().CanSwap() == false || n2.GetSwappable().CanSwap() == false) return;
-            if (n1.GetMatchable().CanMatch() == false || n2.GetMatchable().CanMatch() == false) return;
-            
-            SwipeTwoNodes(pos1 , pos2);
+            //if (n1.GetSwappable().CanSwap() == false || n2.GetSwappable().CanSwap() == false) return;
+            //if (n1.GetMatchable().CanMatch() == false || n2.GetMatchable().CanMatch() == false) return;
 
+            if (!(n1.GetSwappable().CanSwap() && n2.GetSwappable().CanSwap())) return;
+
+            SwipeTwoNodes(pos1 , pos2);
+            
+            if (n1.IsBomb)
+            {
+                ExplodeRegion(n1.BombRank - 3 , n1.IndexedPosition);
+                return;
+            }
+            else if (n2.IsBomb)
+            {
+                ExplodeRegion(n2.BombRank - 3 , n2.IndexedPosition);
+                return;
+            }
+
+            if (!(n1.GetMatchable().CanMatch() && n2.GetMatchable().CanMatch())) return;
+       
+            
+            
             var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);
             var pm2 = _matchDiagnoser.GetMatchAtPoint(_board, pos2.x, pos2.y);
 
@@ -235,9 +247,25 @@ namespace CoreGameplay
             }
             SwipeTwoNodes(pos1 , pos2);
         }
+
+        private void ExplodeRegion(int radius , Vector2Int origin)
+        {
+            ForeachNode(_board, (node , x , y) =>
+            {
+                var l = Mathf.Sqrt(Mathf.Pow((x - origin.x), 2) + Mathf.Pow((y - origin.y), 2));
+                if (l <= radius)
+                {
+                    DestroyNode(x , y);
+                }
+            });
+
+            ApplyGravity();
+        }
+
         private void ApplyGravity()
         {
             //return;
+            _nodeSpawner.Spawn(this);
             var counter = _gravityProvider.ApplyGravity(this);
             //Debug.Log($"Gravity applied to {counter} objects");
             var appliedCounter = 0;
@@ -248,7 +276,7 @@ namespace CoreGameplay
                 //Debug.Log($"Gravity applied to {counter} objects");
                 appliedCounter++;
             }
-
+            CheckBoard();
             if (appliedCounter > 0)
             {
                 Invoke(nameof(CheckBoard),AnimationNumbers.Instance.CheckDelay); 
@@ -262,6 +290,7 @@ namespace CoreGameplay
             foreach (var match in matches)
             {
                 DestroyMatch(match);
+               
             }
 
             if (matches.Count() > 0)
@@ -294,6 +323,13 @@ namespace CoreGameplay
             {
                 DestroyNode(pos.x , pos.y);
             }
+
+            if (match.Rank >= 4)
+            {
+                SetNode(match.Origin , NodeFactory.Instance.GetBomb(match.Rank) ,false);
+            }
+                
+       
         }
         private void DestroyNode(int x , int y)
         {
@@ -305,6 +341,7 @@ namespace CoreGameplay
         public void SetNode(Vector2Int pos , GameObject node)
         {
             DestroyNode(pos.x , pos.y);
+            if (node == null) return;
             InstantiateNode(node ,  pos.x , pos.y);
         }
         

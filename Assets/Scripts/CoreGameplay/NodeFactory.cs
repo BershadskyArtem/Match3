@@ -19,6 +19,11 @@ namespace CoreGameplay
 
         [Header("GeneratorPerfabs")] 
         [SerializeField]private GameObject standartRandomGenerator;
+
+        [Header("Bombs")] 
+        [SerializeField] private GameObject Bomb4;
+        [SerializeField] private GameObject Bomb5;
+        [SerializeField] private GameObject Bomb6;
         
         
         public GameObject GetPrefab(NodeColor color)
@@ -68,5 +73,23 @@ namespace CoreGameplay
         {
             Instance = this;
         }
+
+        public GameObject GetBomb(int rank)
+        {
+            switch (rank)
+            {
+                case 4:
+                    return Bomb4;
+                case 5:
+                    return Bomb5;
+                case 6:
+                    return Bomb6;
+                default:
+                    return Bomb6;
+            }
+            
+            
+        }
+        
     }
 }

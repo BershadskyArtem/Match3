@@ -20,7 +20,6 @@ namespace CoreGameplay
         private void Start()
         {
             IsMobile = Application.isMobilePlatform;
-            OnSwipe?.Invoke(Direction.Down);
         }
 
         private void SetNewNode()
@@ -30,7 +29,7 @@ namespace CoreGameplay
             if (hits.Length == 0)
             {
                 OnNewNodeSelected?.Invoke(null);   
-                Debug.LogError("Setted as Null");
+                    //Debug.LogError("Setted as Null");
                 return;
             }
             var hit = hits[0];

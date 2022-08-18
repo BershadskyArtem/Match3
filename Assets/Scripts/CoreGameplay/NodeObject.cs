@@ -27,6 +27,11 @@ namespace CoreGameplay
         private ISwappable _swappable;
 
         [SerializeField] private TextMeshProUGUI text;
+        public Vector2Int IndexedPosition
+        {
+            get => _indexedPosition;
+        }
+
         private void Awake()
         {
             _indexedPosition = new Vector2Int(-1,-1);
@@ -95,9 +100,9 @@ namespace CoreGameplay
 
         public void DestroyNode()
         {
-            return;
             if (this == null || this.gameObject == null) return;
-            
+            Destroy(this.gameObject);
+            return;
             try
             {
                 StartCoroutine(nameof(DestoryEffect));

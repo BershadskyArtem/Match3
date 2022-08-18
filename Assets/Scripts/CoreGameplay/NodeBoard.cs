@@ -3,15 +3,16 @@ using System.Linq;
 using CoreGameplay.Base;
 using CoreGameplay.BoardGravity;
 using CoreGameplay.Implementations;
+using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
+using Lean.Touch;
 using UnityEngine;
 
 namespace CoreGameplay
 {
     public class NodeBoard : MonoBehaviour
     {
-
         [SerializeField] private int width;
         [SerializeField] private int height;
         [SerializeField] private RectTransform boardParent;
@@ -21,19 +22,74 @@ namespace CoreGameplay
         private readonly IBoardProvider _boardProvider;
         private readonly IMatchDiagnoser _matchDiagnoser;
         private readonly IBoardGravityProvider _gravityProvider;
+        private readonly INodeSpawner _nodeSpawner;
+
+        private NodeObject _activeNode;
 
         public NodeBoard()
         {
+            _nodeSpawner = new LineSpawner();
             _boardProvider = new RandomBoardProvider();
             _gravityProvider = new BoardGravityProviderV2();
             _matchDiagnoser = new MatchDiagnoser()
                 .AddMatchRule(new CrossMatchRule())
                 .AddMatchRule(new HorizontalMatchRule())
                 .AddMatchRule(new VerticalMatchRule());
+            
+        }
+
+        private void OnEnable()
+        {
+            SwipesRegistrar.OnSwipe += HandleSwipes;
+            SwipesRegistrar.OnNewNodeSelected += HandleNewNode;
+            // Lean.Touch.LeanTouch.OnFingerSwipe += HandleSwipesT;
+        }
+
+        private void HandleNewNode(NodeObject obj)
+        {
+            this._activeNode = obj;
+        }
+
+        private void OnDisable()
+        {
+            SwipesRegistrar.OnSwipe -= HandleSwipes;
+           // Lean.Touch.LeanTouch.OnFingerSwipe -= HandleSwipesT;
+        }
+
+        private void HandleSwipesT(LeanFinger leanFinger)
+        {
+            //Debug.LogError(leanFinger.SwipeScaledDelta);
+        }
+
+        private void HandleSwipes(Direction direction)
+        {
+            //Debug.Log(direction);
+            if (_activeNode == null)
+            {
+                //Debug.LogError("Active node is null");
+                return;
+            }
+            var pos = _activeNode.IndexedPosition;
+            switch (direction)
+            {
+                case Direction.Down:
+                    TrySwipeTwoNodes(pos , pos + Vector2Int.down);
+                    break;
+                case Direction.Left:
+                    TrySwipeTwoNodes(pos , pos + Vector2Int.left);
+                    break;
+                case Direction.Right:
+                    TrySwipeTwoNodes(pos , pos + Vector2Int.right);
+                    break;
+                case Direction.Up:
+                    TrySwipeTwoNodes(pos , pos + Vector2Int.up);
+                    break;
+            }
         }
 
         #region Done
-        
+
+   
       
         public NodeObject[,] GetBoard()
         {
@@ -103,6 +159,9 @@ namespace CoreGameplay
             {
                 MoveNodeToCoord(board[x, y], x, y);
             });
+
+            _activeNode = _board[0, 0];
+
         }
 
         private void InstantiateNode(GameObject obj , int x , int y)
@@ -131,7 +190,7 @@ namespace CoreGameplay
         private void VerifyBoard()
         {
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
-            Debug.Log($"Verified = {matches.Count()}");
+            //Debug.Log($"Verified = {matches.Count()}");
             foreach (var match in matches)
             {
                 SetNodeAtPoint(
@@ -178,13 +237,15 @@ namespace CoreGameplay
         }
         private void ApplyGravity()
         {
+            //return;
             var counter = _gravityProvider.ApplyGravity(this);
-            Debug.Log($"Gravity applied to {counter} objects");
+            //Debug.Log($"Gravity applied to {counter} objects");
             var appliedCounter = 0;
             while (counter > 0)
             {
+                _nodeSpawner.Spawn(this);
                 counter = _gravityProvider.ApplyGravity(this);
-                Debug.Log($"Gravity applied to {counter} objects");
+                //Debug.Log($"Gravity applied to {counter} objects");
                 appliedCounter++;
             }
 
@@ -216,13 +277,15 @@ namespace CoreGameplay
         }
         public void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2 , bool useGravityTime = false)
         {
+            var isInside = this.IsInsideBoard(pos1) && this.IsInsideBoard(pos2);
+            if(!isInside) return;
             //swipe visuals
             _board[pos1.x, pos1.y]?.MoveToPosition(pos2 , useGravityTime);
             _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , useGravityTime);
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
-            Debug.Log($"Swiped {pos1} / {pos2}");
+            //Debug.Log($"Swiped {pos1} / {pos2}");
         }
         private void DestroyMatch(Match match)
         {
@@ -243,6 +306,13 @@ namespace CoreGameplay
         {
             DestroyNode(pos.x , pos.y);
             InstantiateNode(node ,  pos.x , pos.y);
+        }
+        
+        public void SetNode(Vector2Int pos , GameObject node , bool isSpawned)
+        {
+            DestroyNode(pos.x , pos.y);
+            InstantiateNode(node ,  pos.x , pos.y);
+            _board[pos.x , pos.y].MoveToPosition(pos , false);
         }
         
     }

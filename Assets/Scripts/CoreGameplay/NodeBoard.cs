@@ -251,17 +251,46 @@ namespace CoreGameplay
 
         private void ExplodeRegion(int radius , Vector2Int origin)
         {
-            List<NodeObject> otherBombs = new List<NodeObject>();
             DestroyNode(origin.x , origin.y);
-            ForeachNode(_board, (node , x , y) =>
-            {
-                var l = Mathf.Sqrt(Mathf.Pow((x - origin.x), 2) + Mathf.Pow((y - origin.y), 2));
-                if (l <= radius)
-                {
-                    DestroyNode(x , y);
-                }
-            });
 
+            switch (radius)
+            {
+                case 1:
+                {
+                    var y = origin.y;
+                    for (int x = 0; x < _board.GetLength(0); x++)
+                    {
+                        if(_board[x, y] == null) continue;
+                        if (_board[x, y].IsBomb)
+                        {
+                            ExplodeRegion(_board[x, y].BombRank - 3, _board[x, y].IndexedPosition);
+                        }else
+                            DestroyNode(x , y);
+                    }
+                    break;
+                }
+                default:
+                {
+                    ForeachNode(_board, (node , x , y) =>
+                    {
+                        if (node[x, y] != null)
+                        {
+                            var l = Mathf.Sqrt(Mathf.Pow((x - origin.x), 2) + Mathf.Pow((y - origin.y), 2));
+                            if (l <= radius)
+                            {
+                                if (node[x, y].IsBomb)
+                                {
+                                    ExplodeRegion(node[x, y].BombRank - 3, node[x, y].IndexedPosition);
+                                }else
+                                    DestroyNode(x , y);
+                            }    
+                        }
+                
+                    });
+                    break;
+                }
+            }
+            
             ApplyGravity();
         }
 

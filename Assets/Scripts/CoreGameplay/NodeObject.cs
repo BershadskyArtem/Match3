@@ -54,7 +54,7 @@ namespace CoreGameplay
                     AnimationNumbers.Instance.SwapTime , true).SetEase(AnimationNumbers.Instance.SwapCurve);   
             }
 
-            text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
+            //text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
         }
 
         public ISwappable GetSwappable() => _swappable;

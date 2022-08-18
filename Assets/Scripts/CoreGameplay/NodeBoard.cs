@@ -17,12 +17,10 @@ namespace CoreGameplay
         [SerializeField] private RectTransform boardParent;
         
         private NodeObject[,] _board;
-        
         private readonly IBoardProvider _boardProvider;
         private readonly IMatchDiagnoser _matchDiagnoser;
         private readonly IBoardGravityProvider _gravityProvider;
-        
-        
+
         public NodeBoard()
         {
             _boardProvider = new RandomBoardProvider();
@@ -212,7 +210,6 @@ namespace CoreGameplay
             
         }
         
-
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x , pos.y);
         public bool IsInsideBoard(int x , int y)
         {
@@ -243,7 +240,11 @@ namespace CoreGameplay
             _board[x, y] = null;
         }
 
-       
+        public void SetNode(Vector2Int pos , GameObject node)
+        {
+            DestroyNode(pos.x , pos.y);
+            InstantiateNode(node ,  pos.x , pos.y);
+        }
         
     }
 }

@@ -123,6 +123,75 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &320247588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 320247589}
+  - component: {fileID: 320247590}
+  - component: {fileID: 320247591}
+  m_Layer: 5
+  m_Name: Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &320247589
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320247588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1537696884}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &320247590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320247588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20b93562cb554d8d91c6a739845cd069, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rect: {fileID: 320247589}
+  _control: {fileID: 320247591}
+  isMatchable: 0
+  color: 1
+  isSwappable: 0
+  text: {fileID: 0}
+  GenerateRandomNodes: 1
+  Direction: {x: 0, y: -1}
+--- !u!114 &320247591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320247588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb3696864c914348ac7b79b861ce2e33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &346038096
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,6 +662,7 @@ MonoBehaviour:
   blueNodePrefab: {fileID: 7687081735098502892, guid: 0ff26a7a3a5717c4aa4c78cde50e65bb, type: 3}
   unknownNodePrefab: {fileID: 151001680800665317, guid: 8e0055d1c5380524f8117db844929fa7, type: 3}
   destroyPrefab: {fileID: 5767455352990646772, guid: bf113b7c7326d004d9c594442109e1bb, type: 3}
+  standartRandomGenerator: {fileID: 151001680800665317, guid: 8e0055d1c5380524f8117db844929fa7, type: 3}
 --- !u!1 &965705892
 GameObject:
   m_ObjectHideFlags: 0
@@ -779,6 +849,7 @@ RectTransform:
   - {fileID: 832587075}
   - {fileID: 346038097}
   - {fileID: 357303682}
+  - {fileID: 320247589}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

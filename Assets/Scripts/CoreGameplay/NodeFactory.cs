@@ -16,6 +16,10 @@ namespace CoreGameplay
 
         [Header("Effects prefabs")] 
         [SerializeField] private GameObject destroyPrefab;
+
+        [Header("GeneratorPerfabs")] 
+        [SerializeField]private GameObject standartRandomGenerator;
+        
         
         public GameObject GetPrefab(NodeColor color)
         {
@@ -51,6 +55,11 @@ namespace CoreGameplay
         public GameObject GetDestroyPrefab()
         {
             return destroyPrefab;
+        }
+
+        public GameObject GetGenerator()
+        {
+            return standartRandomGenerator;
         }
         
         public static NodeFactory Instance;

@@ -56,6 +56,7 @@ namespace CoreGameplay.Implementations
 
         public Match GetMatchAtPoint(NodeObject[,] board, int xPos, int yPos)
         {
+            if(board[xPos,yPos] == null)  return Match.Zero; 
             var pos = new Vector2Int(xPos , yPos);
             var nodeColor = board[xPos, yPos].GetColor();
             if(nodeColor == NodeColor.Unknown) return Match.Zero;

@@ -18,7 +18,6 @@ namespace CoreGameplay.Matches
             return match.Rank == 0;
         }
         
-
         private Match()
         {
             Origin = new Vector2Int();

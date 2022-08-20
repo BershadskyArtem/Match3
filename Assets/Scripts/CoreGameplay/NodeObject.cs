@@ -28,6 +28,9 @@ namespace CoreGameplay
         private IMatchable _matchable;
         private ISwappable _swappable;
 
+
+        private bool _isMoving;
+
         [SerializeField] private TextMeshProUGUI text;
         public Vector2Int IndexedPosition
         {
@@ -46,6 +49,50 @@ namespace CoreGameplay
            
         }
 
+        
+        
+        
+        public void MoveToPositionLerp(Vector2Int index , bool useLongTime)
+        {
+            if(index == _indexedPosition) return;
+            var diff = index.y - _indexedPosition.y;
+            _indexedPosition = index;
+            var destination = new Vector2((float) index.x * AnimationNumbers.Instance.Gap,
+                (float) index.y * AnimationNumbers.Instance.Gap);
+            if (useLongTime)
+            {
+                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.Instance.FallTime));
+            }
+            else
+            {
+                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.Instance.SwapTime));
+            }
+            
+        }
+
+        public IEnumerator MoveCoroutine(Vector2 destination , float time)
+        {
+            Vector3 start = this.gameObject.transform.localPosition;
+            Vector3 end = destination;
+
+            for (float i = 0; i <= 1 * time; i+= Time.deltaTime)
+            {
+                this.gameObject.transform.localPosition = Vector3.Slerp(start, end, i / time);
+                yield return null;
+            }
+            this.gameObject.transform.localPosition = destination;
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         public void MoveToPosition(Vector2Int index , bool useLongTime)
         {
             if(index == _indexedPosition) return;

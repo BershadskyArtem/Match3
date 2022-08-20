@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CoreGameplay.Base;
 using CoreGameplay.BoardGravity;
 using CoreGameplay.Implementations;
@@ -174,7 +176,8 @@ namespace CoreGameplay
 
         private void MoveNodeToCoord(NodeObject node , int x , int y)
         {
-            node.MoveToPosition(new Vector2Int(x, y) , true);
+            //node.MoveToPosition(new Vector2Int(x, y) , true);
+            node.MoveToPositionLerp(new Vector2Int(x, y) , true);
         }
 
         private void SetNodeAtPoint(GameObject obj, int x , int y)
@@ -197,7 +200,6 @@ namespace CoreGameplay
         }
 
         #endregion
-        
         public void TrySwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2)
         {
             if(!IsInsideBoard(pos1) || !IsInsideBoard(pos2)) return;
@@ -213,6 +215,16 @@ namespace CoreGameplay
             if (!(n1.GetSwappable().CanSwap() && n2.GetSwappable().CanSwap())) return;
 
             SwipeTwoNodes(pos1 , pos2);
+
+            //return;
+
+            StartCoroutine(Part2(pos1, pos2, n1, n2));
+
+
+            GC.Collect();
+            
+            return;
+            
             
             if (n1.IsBomb)
             {
@@ -249,6 +261,51 @@ namespace CoreGameplay
             SwipeTwoNodes(pos1 , pos2);
         }
 
+
+        /// <summary>
+        /// DONT CALL THIS UNLESS YOU KNOW WHAT IT IS
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator Part2(Vector2Int pos1 , Vector2Int pos2 , NodeObject n1, NodeObject n2)
+        {
+            yield return new WaitForSeconds(AnimationNumbers.Instance.SwapTime);
+            
+            if (n1.IsBomb)
+            {
+                ExplodeRegion(n1.BombRank - 3 , n1.IndexedPosition);
+                yield break;
+            }
+            else if (n2.IsBomb)
+            {
+                ExplodeRegion(n2.BombRank - 3 , n2.IndexedPosition);
+                yield break;
+            }
+
+            if (!(n1.GetMatchable().CanMatch() && n2.GetMatchable().CanMatch())) yield break;;
+       
+            //yield break;
+            
+            var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);
+            var pm2 = _matchDiagnoser.GetMatchAtPoint(_board, pos2.x, pos2.y);
+
+            if (!Match.isZero(pm1))
+            {
+                DestroyMatch(pm1);
+            }
+            if (!Match.isZero(pm2))
+            {
+                DestroyMatch(pm2);
+            }
+
+            if (!Match.isZero(pm1) || !Match.isZero(pm2))
+            {
+                Invoke(nameof(ApplyGravity),AnimationNumbers.Instance.GravityDelay); 
+                yield break;
+            }
+            SwipeTwoNodes(pos1 , pos2);
+            
+        }
+        
         private void ExplodeRegion(int radius , Vector2Int origin)
         {
             DestroyNode(origin.x , origin.y);
@@ -341,8 +398,11 @@ namespace CoreGameplay
             var isInside = this.IsInsideBoard(pos1) && this.IsInsideBoard(pos2);
             if(!isInside) return;
             //swipe visuals
-            _board[pos1.x, pos1.y]?.MoveToPosition(pos2 , useGravityTime);
-            _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , useGravityTime);
+            //_board[pos1.x, pos1.y]?.MoveToPosition(pos2 , useGravityTime);
+           // _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , useGravityTime);
+           
+           _board[pos1.x, pos1.y]?.MoveToPositionLerp(pos2 , useGravityTime);
+           _board[pos2.x, pos2.y]?.MoveToPositionLerp(pos1 , useGravityTime);
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
@@ -369,19 +429,18 @@ namespace CoreGameplay
             _board[x,y]?.DestroyNode();
             _board[x, y] = null;
         }
-
         public void SetNode(Vector2Int pos , GameObject node)
         {
             DestroyNode(pos.x , pos.y);
             if (node == null) return;
             InstantiateNode(node ,  pos.x , pos.y);
         }
-        
         public void SetNode(Vector2Int pos , GameObject node , bool isSpawned)
         {
             DestroyNode(pos.x , pos.y);
             InstantiateNode(node ,  pos.x , pos.y);
-            _board[pos.x , pos.y].MoveToPosition(pos , false);
+           // _board[pos.x , pos.y].MoveToPosition(pos , false);
+            _board[pos.x , pos.y].MoveToPositionLerp(pos , false);
         }
         
     }

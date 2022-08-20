@@ -306,6 +306,7 @@ MonoBehaviour:
   SwapTime: 0.2
   FallTime: 0.3
   DeathScaleTime: 0.5
+  FlyAwayTime: 1
   FallCurve:
     serializedVersion: 2
     m_Curve:
@@ -546,7 +547,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 12
   height: 8
-  boardParent: {fileID: 0}
   boardTransformParent: {fileID: 603314074}
 --- !u!1 &1599317716
 GameObject:

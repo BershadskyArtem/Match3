@@ -1,4 +1,5 @@
 ﻿using CoreGameplay.Base;
+using CoreGameplay.Kinds;
 using UnityEngine;
 
 namespace CoreGameplay.Matches.Rules
@@ -32,6 +33,7 @@ namespace CoreGameplay.Matches.Rules
                 
                 match.AddPosition(new Vector2Int(xPos , y));
             }
+            match.Kind = MatchKind.Vertical;
             return match.Rank > 2;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using CoreGameplay.Base;
+using CoreGameplay.Kinds;
 
 namespace CoreGameplay.Matches.Rules
 {
@@ -24,6 +25,8 @@ namespace CoreGameplay.Matches.Rules
 
             match.AddRangePosition(mh.Positions);
             match.AddRangePosition(mv.Positions);
+
+            match.Kind = MatchKind.Cross;
 
             return mh.Rank > 2 && mv.Rank > 2;
         }

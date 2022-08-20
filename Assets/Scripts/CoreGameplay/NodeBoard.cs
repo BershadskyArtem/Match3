@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Runtime.CompilerServices;
 using CoreGameplay.Base;
 using CoreGameplay.BoardGravity;
 using CoreGameplay.Implementations;
@@ -17,7 +16,6 @@ namespace CoreGameplay
     {
         [SerializeField] private int width;
         [SerializeField] private int height;
-        [SerializeField] private RectTransform boardParent;
         [SerializeField] private Transform boardTransformParent;
         
         private NodeObject[,] _board;
@@ -27,6 +25,7 @@ namespace CoreGameplay
         private readonly INodeSpawner _nodeSpawner;
 
         private NodeObject _activeNode;
+        
 
         public NodeBoard()
         {
@@ -37,7 +36,6 @@ namespace CoreGameplay
                 .AddMatchRule(new CrossMatchRule())
                 .AddMatchRule(new HorizontalMatchRule())
                 .AddMatchRule(new VerticalMatchRule());
-            
         }
 
         private void OnEnable()
@@ -61,7 +59,6 @@ namespace CoreGameplay
       
         private void HandleSwipes(Direction direction)
         {
-            //Debug.Log(direction);
             if (_activeNode == null)
             {
                 //Debug.LogError("Active node is null");
@@ -94,7 +91,7 @@ namespace CoreGameplay
             return _board;
         }
         
-        public void ResetBoard()
+        private void ResetBoard()
         {
             if (_board != null)
             {
@@ -107,7 +104,7 @@ namespace CoreGameplay
             _board = new NodeObject[width, height];
         }
         
-        public void ForeachNode(NodeObject[,] board , Action<NodeObject> actor)
+        private void ForeachNode(NodeObject[,] board , Action<NodeObject> actor)
         {
             for (int x = 0; x < board.GetLength(0); x++)
             {
@@ -118,7 +115,7 @@ namespace CoreGameplay
             }
         }
         
-        public void ForeachNode(NodeObject[,] board, Action<NodeObject[,], int, int> actor)
+        private void ForeachNode(NodeObject[,] board, Action<NodeObject[,], int, int> actor)
         {
             for (int x = 0; x < board.GetLength(0); x++)
             {
@@ -129,7 +126,7 @@ namespace CoreGameplay
             }
         }
 
-        public void ForeachNode(GameObject[,] boardPrefabs, Action<GameObject, int, int> actor)
+        private void ForeachNode(GameObject[,] boardPrefabs, Action<GameObject, int, int> actor)
         {
             for (int x = 0; x < boardPrefabs.GetLength(0); x++)
             {
@@ -144,10 +141,7 @@ namespace CoreGameplay
         {
             ResetBoard();
             var board = _boardProvider.GetNewBoard(width, height);
-            ForeachNode(board , (nodeObject, x, y) =>
-            {
-                InstantiateNode(nodeObject , x , y);
-            } );
+            ForeachNode(board, InstantiateNode);
             VerifyBoard();
             VerifyBoard();
             VerifyBoard();
@@ -176,8 +170,7 @@ namespace CoreGameplay
 
         private void MoveNodeToCoord(NodeObject node , int x , int y)
         {
-            //node.MoveToPosition(new Vector2Int(x, y) , true);
-            node.MoveToPositionLerp(new Vector2Int(x, y) , true);
+            node.FallToPos(new Vector2Int(x, y));
         }
 
         private void SetNodeAtPoint(GameObject obj, int x , int y)
@@ -208,57 +201,14 @@ namespace CoreGameplay
             var n2 = _board[pos2.x , pos2.y];
 
             if(n1 == null || n2 == null) return;
-            
-            //if (n1.GetSwappable().CanSwap() == false || n2.GetSwappable().CanSwap() == false) return;
-            //if (n1.GetMatchable().CanMatch() == false || n2.GetMatchable().CanMatch() == false) return;
 
             if (!(n1.GetSwappable().CanSwap() && n2.GetSwappable().CanSwap())) return;
 
             SwipeTwoNodes(pos1 , pos2);
 
-            //return;
-
-            StartCoroutine(Part2(pos1, pos2, n1, n2));
-
-
+            StartCoroutine(CheckSwipeCoroutine(pos1, pos2, n1, n2));
+            
             GC.Collect();
-            
-            return;
-            
-            
-            if (n1.IsBomb)
-            {
-                ExplodeRegion(n1.BombRank - 3 , n1.IndexedPosition);
-                return;
-            }
-            else if (n2.IsBomb)
-            {
-                ExplodeRegion(n2.BombRank - 3 , n2.IndexedPosition);
-                return;
-            }
-
-            if (!(n1.GetMatchable().CanMatch() && n2.GetMatchable().CanMatch())) return;
-       
-            
-            
-            var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);
-            var pm2 = _matchDiagnoser.GetMatchAtPoint(_board, pos2.x, pos2.y);
-
-            if (!Match.isZero(pm1))
-            {
-                DestroyMatch(pm1);
-            }
-            if (!Match.isZero(pm2))
-            {
-                DestroyMatch(pm2);
-            }
-
-            if (!Match.isZero(pm1) || !Match.isZero(pm2))
-            {
-                Invoke(nameof(ApplyGravity),AnimationNumbers.Instance.GravityDelay); 
-                return;
-            }
-            SwipeTwoNodes(pos1 , pos2);
         }
 
 
@@ -266,9 +216,9 @@ namespace CoreGameplay
         /// DONT CALL THIS UNLESS YOU KNOW WHAT IT IS
         /// </summary>
         /// <returns></returns>
-        private IEnumerator Part2(Vector2Int pos1 , Vector2Int pos2 , NodeObject n1, NodeObject n2)
+        private IEnumerator CheckSwipeCoroutine(Vector2Int pos1 , Vector2Int pos2 , NodeObject n1, NodeObject n2)
         {
-            yield return new WaitForSeconds(AnimationNumbers.Instance.SwapTime);
+            yield return new WaitForSeconds(AnimationNumbers.SwapSpeed);
             
             if (n1.IsBomb)
             {
@@ -281,10 +231,8 @@ namespace CoreGameplay
                 yield break;
             }
 
-            if (!(n1.GetMatchable().CanMatch() && n2.GetMatchable().CanMatch())) yield break;;
-       
-            //yield break;
-            
+            if (!(n1.GetMatchable().CanMatch() && n2.GetMatchable().CanMatch())) yield break;
+
             var pm1 = _matchDiagnoser.GetMatchAtPoint(_board, pos1.x, pos1.y);
             var pm2 = _matchDiagnoser.GetMatchAtPoint(_board, pos2.x, pos2.y);
 
@@ -299,7 +247,7 @@ namespace CoreGameplay
 
             if (!Match.isZero(pm1) || !Match.isZero(pm2))
             {
-                Invoke(nameof(ApplyGravity),AnimationNumbers.Instance.GravityDelay); 
+                Invoke(nameof(ApplyGravity),AnimationNumbers.GravityApplyDelay); 
                 yield break;
             }
             SwipeTwoNodes(pos1 , pos2);
@@ -353,10 +301,8 @@ namespace CoreGameplay
 
         private void ApplyGravity()
         {
-            //return;
             _nodeSpawner.Spawn(this);
             var counter = _gravityProvider.ApplyGravity(this);
-            //Debug.Log($"Gravity applied to {counter} objects");
             var appliedCounter = 0;
             while (counter > 0)
             {
@@ -368,45 +314,47 @@ namespace CoreGameplay
             CheckBoard();
             if (appliedCounter > 0)
             {
-                Invoke(nameof(CheckBoard),AnimationNumbers.Instance.CheckDelay); 
+                Invoke(nameof(CheckBoard),AnimationNumbers.SwipeCheckDelay); 
             }
             
         }
         private void CheckBoard()
         {
             var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
-
-            foreach (var match in matches)
+            var iMatches = matches as Match[] ?? matches.ToArray();
+            foreach (var match in iMatches)
             {
                 DestroyMatch(match);
-               
             }
-
-            if (matches.Count() > 0)
+            if (iMatches.Any())
             {
-                Invoke(nameof(ApplyGravity) , AnimationNumbers.Instance.GravityDelay);
+                Invoke(nameof(ApplyGravity) , AnimationNumbers.GravityApplyDelay);
             }
-            
         }
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x , pos.y);
-        public bool IsInsideBoard(int x , int y)
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsInsideBoard(int x , int y)
         {
             return x >= 0 && x < width && y >= 0 && y < height;
         }
         public void SwipeTwoNodes(Vector2Int pos1 , Vector2Int pos2 , bool useGravityTime = false)
         {
+        
             var isInside = this.IsInsideBoard(pos1) && this.IsInsideBoard(pos2);
             if(!isInside) return;
             //swipe visuals
             //_board[pos1.x, pos1.y]?.MoveToPosition(pos2 , useGravityTime);
            // _board[pos2.x, pos2.y]?.MoveToPosition(pos1 , useGravityTime);
            
-           _board[pos1.x, pos1.y]?.MoveToPositionLerp(pos2 , useGravityTime);
-           _board[pos2.x, pos2.y]?.MoveToPositionLerp(pos1 , useGravityTime);
+           //_board[pos1.x, pos1.y]?.MoveToPositionLerp(pos2 , useGravityTime);
+           //_board[pos2.x, pos2.y]?.MoveToPositionLerp(pos1 , useGravityTime);
+          
+           _board[pos1.x, pos1.y]?.SwapToPos(pos2);
+           _board[pos2.x, pos2.y]?.SwapToPos(pos1);
             
             //swipe in array
             (_board[pos1.x, pos1.y], _board[pos2.x, pos2.y]) = (_board[pos2.x, pos2.y], _board[pos1.x, pos1.y]);
-            //Debug.Log($"Swiped {pos1} / {pos2}");
         }
         private void DestroyMatch(Match match)
         {
@@ -440,7 +388,7 @@ namespace CoreGameplay
             DestroyNode(pos.x , pos.y);
             InstantiateNode(node ,  pos.x , pos.y);
            // _board[pos.x , pos.y].MoveToPosition(pos , false);
-            _board[pos.x , pos.y].MoveToPositionLerp(pos , false);
+            _board[pos.x , pos.y].SwapToPos(pos);
         }
         
     }

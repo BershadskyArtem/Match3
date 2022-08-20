@@ -12,6 +12,7 @@ namespace CoreGameplay.Matches
         public int Rank => Positions.Count;
 
         public static Match Zero => new Match();
+        public MatchKind Kind { get; set; }
 
         public static bool isZero(Match match)
         {

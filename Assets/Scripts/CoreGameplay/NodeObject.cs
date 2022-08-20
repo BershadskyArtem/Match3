@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
@@ -48,33 +47,29 @@ namespace CoreGameplay
             _swappable = new SwappableProperty(isSwappable);
            
         }
-
         
-        
-        
-        public void MoveToPositionLerp(Vector2Int index , bool useLongTime)
+        public void MoveToPositionLerp2(Vector2Int index , bool useLongTime)
         {
             if(index == _indexedPosition) return;
             var diff = index.y - _indexedPosition.y;
             _indexedPosition = index;
-            var destination = new Vector2((float) index.x * AnimationNumbers.Instance.Gap,
-                (float) index.y * AnimationNumbers.Instance.Gap);
+            var destination = new Vector2((float) index.x * AnimationNumbers.NodeGap,
+                (float) index.y * AnimationNumbers.NodeGap);
             if (useLongTime)
             {
-                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.Instance.FallTime));
+                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.FallSpeed));
             }
             else
             {
-                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.Instance.SwapTime));
+                StartCoroutine(MoveCoroutine(destination, AnimationNumbers.SwapSpeed));
             }
-            
         }
 
         public IEnumerator MoveCoroutine(Vector2 destination , float time)
         {
             Vector3 start = this.gameObject.transform.localPosition;
             Vector3 end = destination;
-
+            Debug.Log("Started moving");
             for (float i = 0; i <= 1 * time; i+= Time.deltaTime)
             {
                 this.gameObject.transform.localPosition = Vector3.Slerp(start, end, i / time);
@@ -82,40 +77,43 @@ namespace CoreGameplay
             }
             this.gameObject.transform.localPosition = destination;
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        public void MoveToPosition(Vector2Int index , bool useLongTime)
+
+
+        public void FallToPos(Vector2Int destination)
+        {
+            _indexedPosition = destination;
+            transform.DOLocalMove(new Vector2((float)destination.x * AnimationNumbers.NodeGap, (float)destination.y * AnimationNumbers.NodeGap), 
+                AnimationNumbers.FallSpeed).SetEase(AnimationNumbers.FallMovCurve); 
+        }
+
+        public void SwapToPos(Vector2Int destination)
+        {
+            _indexedPosition = destination;
+            transform.DOLocalMove(new Vector2((float)destination.x * AnimationNumbers.NodeGap, (float)destination.y * AnimationNumbers.NodeGap), 
+                AnimationNumbers.SwapSpeed).SetEase(AnimationNumbers.SwapMovCurve);
+        }
+
+        public void MoveToPositionLerp(Vector2Int index , bool useLongTime)
         {
             if(index == _indexedPosition) return;
             var diff = index.y - _indexedPosition.y;
             _indexedPosition = index;
-            
-            //Debug.Log(AnimationNumbers.Instance.FallTime * Mathf.Abs(diff));
             if (useLongTime)
             {
                 //rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
                 //    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff) , true).SetEase(AnimationNumbers.Instance.FallCurve); 
-                transform.DOLocalMove(new Vector2((float)index.x * AnimationNumbers.Instance.Gap, (float)index.y * AnimationNumbers.Instance.Gap), 
-                    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff)).SetEase(AnimationNumbers.Instance.FallCurve); 
+                transform.DOLocalMove(new Vector2((float)index.x * AnimationNumbers.NodeGap, (float)index.y * AnimationNumbers.NodeGap), 
+                    AnimationNumbers.FallSpeed * Mathf.Abs(diff)).SetEase(AnimationNumbers.FallMovCurve); 
                 
             }
             else
             {
                 //rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
                 //    AnimationNumbers.Instance.SwapTime , true).SetEase(AnimationNumbers.Instance.SwapCurve);   
-                float x = (float) index.x * AnimationNumbers.Instance.Gap;
-                float y = (float) index.y * AnimationNumbers.Instance.Gap;
+                float x = (float) index.x * AnimationNumbers.NodeGap;
+                float y = (float) index.y * AnimationNumbers.NodeGap;
                 transform.DOLocalMove(new Vector2(x,y), 
-                    AnimationNumbers.Instance.SwapTime).SetEase(AnimationNumbers.Instance.SwapCurve);   
+                    AnimationNumbers.SwapSpeed).SetEase(AnimationNumbers.SwapMovCurve);   
             }
 
             //text.text = $"{_indexedPosition.x}:{_indexedPosition.y}";
@@ -152,55 +150,15 @@ namespace CoreGameplay
 
         public void DestroyNode()
         {
-            if (this == null || this.gameObject == null) return;
-            this.gameObject.transform.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime)
-                .SetEase(AnimationNumbers.Instance.DestroyCurve).onComplete += () =>
+            //gameObject.transform.DOScale(Vector3.zero, AnimationNumbers.DeathAnimationSpeed).SetEase(AnimationNumbers.DestroyScaleCurve);
+            gameObject.transform.DOLocalMove(new Vector3(-4,4.22f,0), AnimationNumbers.NodeFlyAwayTime)    
+                .onComplete += () =>
             {
-                Destroy(this.gameObject);
-            };
-            Destroy(this);
-            return;
-            try
-            {
-                StartCoroutine(nameof(DestoryEffect));
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            
+                Destroy(gameObject);
+            }; 
+            Destroy(this); 
         }
         
-        private IEnumerator DestoryEffect()
-        {
-           
-            if (this.gameObject == null) yield break;
-            
-            bool s = true;
-            bool n = true;
-            if (s)
-            {
-                s = false;
-                yield return new WaitForSeconds(0.1f);
-            }
-            
-            var ef = Instantiate(NodeFactory.Instance.GetDestroyPrefab(), rect.parent);
-            Vector2 vec = _indexedPosition;
-            vec.x *= AnimationNumbers.Instance.Gap;
-            vec.y *= AnimationNumbers.Instance.Gap;
-            ef.GetComponent<RectTransform>().anchoredPosition = vec;
-            this.rect.DOScale(Vector3.zero, AnimationNumbers.Instance.DeathScaleTime).SetEase(AnimationNumbers.Instance.DestroyCurve);
-
-            if (n)
-            {
-                n = false;
-                yield return new WaitForSeconds( AnimationNumbers.Instance.DeathScaleTime + 0.1f);
-            }            
-            if(this.gameObject != null)
-                Destroy(this.gameObject);
-           
-            yield return null;
-        }
         
     }
 }

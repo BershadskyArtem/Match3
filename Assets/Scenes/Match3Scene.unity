@@ -302,7 +302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CheckDelay: 0.15
   GravityDelay: 0.2
-  Gap: 1.2
+  Gap: 1
   SwapTime: 0.2
   FallTime: 0.3
   DeathScaleTime: 0.5

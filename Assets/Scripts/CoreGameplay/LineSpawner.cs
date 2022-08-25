@@ -15,7 +15,11 @@ namespace CoreGameplay
             {
                 if (board[x, heightIndex] == null)
                 {
-                    nodeBoard.SetNode(new Vector2Int(x , heightIndex) , NodeFactory.Instance.GetRandomPrefab() , false);
+                    nodeBoard.SetNode(new Vector2Int(x , heightIndex) , NodeFactory.Instance.GetRandomPrefab() , true);
+                   nodeBoard.SpawnNode(new Vector2Int(x, heightIndex + 1), new Vector2Int(x, heightIndex),
+                        NodeFactory.Instance.GetRandomPrefab());
+                   // nodeBoard.Spawn(new Vector2Int(x, heightIndex + 1), new Vector2Int(x, heightIndex),
+                   //     NodeFactory.Instance.GetRandomPrefab());
                 }    
             }
 

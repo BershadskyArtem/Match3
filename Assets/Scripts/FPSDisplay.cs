@@ -21,7 +21,7 @@ public class FPSDisplay : MonoBehaviour
 
    private void Start()
    {
-       Application.targetFrameRate = 120;
+       Application.targetFrameRate = 500;
    }
 
    void Update()

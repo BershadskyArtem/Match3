@@ -22,7 +22,7 @@ namespace CoreGameplay
         [SerializeField] private bool isBomb;
         [SerializeField] private int bombRank;
         
-        private Vector2Int _indexedPosition;
+        public Vector2Int _indexedPosition;
         private NodeBoard _board;
         private IMatchable _matchable;
         private ISwappable _swappable;
@@ -78,6 +78,12 @@ namespace CoreGameplay
             this.gameObject.transform.localPosition = destination;
         }
 
+        public void ForcePosition(Vector2Int destination)
+        {
+            transform.localPosition = new Vector2((float) destination.x * AnimationNumbers.NodeGap,
+                (float) destination.y * AnimationNumbers.NodeGap);
+        }
+
 
         public void FallToPos(Vector2Int destination)
         {
@@ -95,7 +101,7 @@ namespace CoreGameplay
 
         public void MoveToPositionLerp(Vector2Int index , bool useLongTime)
         {
-            if(index == _indexedPosition) return;
+            //if(index == _indexedPosition) return;
             var diff = index.y - _indexedPosition.y;
             _indexedPosition = index;
             if (useLongTime)
@@ -103,7 +109,7 @@ namespace CoreGameplay
                 //rect.DOAnchorPos(new Vector2(index.x * AnimationNumbers.Instance.Gap, index.y * AnimationNumbers.Instance.Gap), 
                 //    AnimationNumbers.Instance.FallTime * Mathf.Abs(diff) , true).SetEase(AnimationNumbers.Instance.FallCurve); 
                 transform.DOLocalMove(new Vector2((float)index.x * AnimationNumbers.NodeGap, (float)index.y * AnimationNumbers.NodeGap), 
-                    AnimationNumbers.FallSpeed * Mathf.Abs(diff)).SetEase(AnimationNumbers.FallMovCurve); 
+                    AnimationNumbers.FallSpeed).SetEase(AnimationNumbers.FallMovCurve); 
                 
             }
             else
@@ -157,6 +163,19 @@ namespace CoreGameplay
                 Destroy(gameObject);
             }; 
             Destroy(this); 
+        }
+
+        public void SpawnFrom(Vector2Int spawnPoint , Vector2Int index)
+        {
+            transform.localPosition = (Vector2)spawnPoint;
+            _indexedPosition = index;
+            transform.DOLocalMove(
+                new Vector2((float) index.x * AnimationNumbers.NodeGap, (float) index.y * AnimationNumbers.NodeGap),
+                AnimationNumbers.FallSpeed).SetEase(AnimationNumbers.FallMovCurve).onComplete = () =>
+            {
+                Debug.Log($"Piece {index} moved to {transform.localPosition}");
+            };
+
         }
         
         

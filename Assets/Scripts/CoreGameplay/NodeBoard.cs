@@ -159,9 +159,7 @@ namespace CoreGameplay
         private void InstantiateNode(GameObject obj , int x , int y)
         {
             if (obj == null) throw new NullReferenceException("Prefab is null");
-
             var o = Instantiate(obj);
-            //o.GetComponent<RectTransform>().SetParent(boardParent , false);
             o.GetComponent<Transform>().SetParent(boardTransformParent , false);
             var no = o.GetComponent<NodeObject>();
             no.SetBoard(this);
@@ -387,9 +385,20 @@ namespace CoreGameplay
         {
             DestroyNode(pos.x , pos.y);
             InstantiateNode(node ,  pos.x , pos.y);
-           // _board[pos.x , pos.y].MoveToPosition(pos , false);
             _board[pos.x , pos.y].SwapToPos(pos);
         }
+        public void SpawnNode(Vector2Int pos , Vector2Int index, GameObject prefab )
+        {
+            DestroyNode(index.x , index.y);
+            if (prefab == null) throw new NullReferenceException("Prefab is null");
+            var instantiatedObject = Instantiate(prefab);
+            instantiatedObject.GetComponent<Transform>().SetParent(boardTransformParent , false);
+            var nodeObject = instantiatedObject.GetComponent<NodeObject>();
+            nodeObject.SetBoard(this);
+            _board[index.x, index.y] = nodeObject;
+            nodeObject.SpawnFrom(pos, index);
+        }
+        
         
     }
 }

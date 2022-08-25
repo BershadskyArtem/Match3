@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
@@ -20,7 +21,7 @@ namespace CoreGameplay
         [SerializeField] private NodeColor color;
         [SerializeField] private bool isSwappable;
         [SerializeField] private bool isBomb;
-        [SerializeField] private int bombRank;
+        [SerializeField] private BombKind bombKind;
         
         public Vector2Int _indexedPosition;
         private NodeBoard _board;
@@ -37,7 +38,7 @@ namespace CoreGameplay
         }
 
         public bool IsBomb => isBomb;
-        public int BombRank => bombRank;
+        public BombKind BombKind => bombKind;
 
         private void Awake()
         {
@@ -80,6 +81,7 @@ namespace CoreGameplay
 
         public void ForcePosition(Vector2Int destination)
         {
+            this._indexedPosition = destination;
             transform.localPosition = new Vector2((float) destination.x * AnimationNumbers.NodeGap,
                 (float) destination.y * AnimationNumbers.NodeGap);
         }
@@ -87,9 +89,10 @@ namespace CoreGameplay
 
         public void FallToPos(Vector2Int destination)
         {
+            float diff = Mathf.Abs(_indexedPosition.y - destination.y);
             _indexedPosition = destination;
             transform.DOLocalMove(new Vector2((float)destination.x * AnimationNumbers.NodeGap, (float)destination.y * AnimationNumbers.NodeGap), 
-                AnimationNumbers.FallSpeed).SetEase(AnimationNumbers.FallMovCurve); 
+                AnimationNumbers.FallSpeed * diff).SetEase(AnimationNumbers.FallMovCurve); 
         }
 
         public void SwapToPos(Vector2Int destination)
@@ -140,16 +143,16 @@ namespace CoreGameplay
             switch (direction)
             {
                 case Direction.Down:
-                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.down);
+                    _board.TrySwapNodes(_indexedPosition , _indexedPosition + Vector2Int.down);
                     break;
                 case Direction.Left:
-                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.left);
+                    _board.TrySwapNodes(_indexedPosition , _indexedPosition + Vector2Int.left);
                     break;
                 case Direction.Right:
-                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.right);
+                    _board.TrySwapNodes(_indexedPosition , _indexedPosition + Vector2Int.right);
                     break;
                 case Direction.Up:
-                    _board.TrySwipeTwoNodes(_indexedPosition , _indexedPosition + Vector2Int.up);
+                    _board.TrySwapNodes(_indexedPosition , _indexedPosition + Vector2Int.up);
                     break;
             }
         }
@@ -161,23 +164,203 @@ namespace CoreGameplay
                 .onComplete += () =>
             {
                 Destroy(gameObject);
+                Destroy(this);
             }; 
-            Destroy(this); 
+            
         }
 
         public void SpawnFrom(Vector2Int spawnPoint , Vector2Int index)
         {
-            transform.localPosition = (Vector2)spawnPoint;
+            transform.localPosition = (Vector2)spawnPoint * AnimationNumbers.NodeGap;
             _indexedPosition = index;
+            float diff = Mathf.Abs(spawnPoint.y - index.y);
             transform.DOLocalMove(
                 new Vector2((float) index.x * AnimationNumbers.NodeGap, (float) index.y * AnimationNumbers.NodeGap),
-                AnimationNumbers.FallSpeed).SetEase(AnimationNumbers.FallMovCurve).onComplete = () =>
+                AnimationNumbers.FallSpeed * diff).SetEase(AnimationNumbers.FallMovCurve).onComplete = () =>
             {
-                Debug.Log($"Piece {index} moved to {transform.localPosition}");
+                //Debug.Log($"Piece {index} moved to {transform.localPosition}");
             };
 
         }
-        
-        
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodeBoard"></param>
+        /// <param name="other"></param>
+        /// <returns>Cancellation of further checks in Tryswapnodes</returns>
+        public bool PreSwipeReaction(NodeBoard nodeBoard, NodeObject other)
+        {
+            return false;
+        }
+
+        public bool SwipeReaction(NodeBoard nodeBoard, NodeObject other)
+        {
+            if (!IsBomb) return false;
+
+            if (other.isBomb == false)
+            {
+                nodeBoard.Boom(BombKind , other);
+                return true;
+            }
+            else
+            {
+                switch (other.BombKind)
+                {
+                    case BombKind.Horizontal:
+                    {
+                        switch (bombKind)
+                        {
+                            case BombKind.Horizontal:
+                            {
+                                nodeBoard.Boom(ExplosionKind.HorizontalHorizontal, other);
+                                break;
+                            }
+                
+                            case BombKind.Vertical:
+                            {
+                                nodeBoard.Boom(ExplosionKind.HorizontalVertical, other);
+                                break;
+                            }
+                
+                            case BombKind.Bomb:
+                            {
+                                nodeBoard.Boom(ExplosionKind.BombHorizontal, other);
+                                break;
+                            }
+                
+                            case BombKind.Color:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorHorizontal, other);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                
+                    case BombKind.Vertical:
+                    {
+                        switch (bombKind)
+                        {
+                            case BombKind.Horizontal:
+                            {
+                                nodeBoard.Boom(ExplosionKind.HorizontalHorizontal, other);
+                                break;
+                            }
+                
+                            case BombKind.Vertical:
+                            {
+                                nodeBoard.Boom(ExplosionKind.VerticalVertical, other);
+                                break;
+                            }
+                
+                            case BombKind.Bomb:
+                            {
+                                nodeBoard.Boom(ExplosionKind.BombVertical, other);
+                                break;
+                            }
+                
+                            case BombKind.Color:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorVertical, other);
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                
+                    case BombKind.Bomb:
+                    {
+                        switch (bombKind)
+                        {
+                            case BombKind.Horizontal:
+                            {
+                                nodeBoard.Boom(ExplosionKind.BombHorizontal, other);
+                                break;
+                            }
+                
+                            case BombKind.Vertical:
+                            {
+                                nodeBoard.Boom(ExplosionKind.BombVertical, other);
+                                break;
+                            }
+                
+                            case BombKind.Bomb:
+                            {
+                                nodeBoard.Boom(ExplosionKind.BombBomb, other);
+                                break;
+                            }
+                
+                            case BombKind.Color:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorBomb, other);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                
+                    case BombKind.Color:
+                    {
+                        switch (bombKind)
+                        {
+                            case BombKind.Horizontal:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorHorizontal, other);
+                                break;
+                            }
+                
+                            case BombKind.Vertical:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorVertical, other);
+                                break;
+                            }
+                
+                            case BombKind.Bomb:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorBomb, other);
+                                break;
+                            }
+                
+                            case BombKind.Color:
+                            {
+                                nodeBoard.Boom(ExplosionKind.ColorColor, other);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+            }
+            
+            if(this.BombKind == BombKind.Color){
+            }
+            
+            return true;
+        }
+
+        public void ResolveAsPartOfMatch()
+        {
+            DestroyNode();
+        }
+
+        public void DestroyWithNoAnimation()
+        {
+            Destroy(gameObject);
+            Destroy(this);
+        }
+
+        public void ResolveAsPartOfMatch(Vector2Int destination)
+        {
+            transform.DOLocalMove(new Vector2((float)destination.x * AnimationNumbers.NodeGap, (float)destination.y * AnimationNumbers.NodeGap), 
+                AnimationNumbers.SwapSpeed).SetEase(AnimationNumbers.SwapMovCurve).onComplete = () =>
+            {
+                Destroy(gameObject);
+                Destroy(this);
+            };
+        }
     }
 }

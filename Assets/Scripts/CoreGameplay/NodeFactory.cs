@@ -21,9 +21,10 @@ namespace CoreGameplay
         [SerializeField]private GameObject standartRandomGenerator;
 
         [Header("Bombs")] 
-        [SerializeField] private GameObject Bomb4;
-        [SerializeField] private GameObject Bomb5;
-        [SerializeField] private GameObject Bomb6;
+        [SerializeField] private GameObject VerticalBomb;
+        [SerializeField] private GameObject HorizontalBomb;
+        [SerializeField] private GameObject BiggestBomb;
+        [SerializeField] private GameObject Bomb;
         
         
         public GameObject GetPrefab(NodeColor color)
@@ -74,21 +75,30 @@ namespace CoreGameplay
             Instance = this;
         }
 
-        public GameObject GetBomb(int rank)
+        public GameObject GetBomb(BombKind kind)
         {
-            switch (rank)
+            switch (kind)
             {
-                case 4:
-                    return Bomb4;
-                case 5:
-                    return Bomb5;
-                case 6:
-                    return Bomb6;
-                default:
-                    return Bomb6;
+                case BombKind.Color:
+                {
+                    return BiggestBomb;
+                }
+                case BombKind.Bomb:
+                {
+                    return Bomb;
+                }
+                case BombKind.Horizontal:
+                {
+                    return HorizontalBomb;
+                }
+                case BombKind.Vertical:
+                {
+                    return VerticalBomb;
+                }
             }
-            
-            
+            return null;
+
+
         }
         
     }

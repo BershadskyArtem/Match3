@@ -2,6 +2,6 @@
 {
     public interface INodeSpawner
     {
-        public void Spawn(NodeBoard nodeBoard);
+        public int Spawn(NodeBoard nodeBoard);
     }
 }

@@ -104,7 +104,8 @@ MonoBehaviour:
   color: 5
   isSwappable: 1
   isBomb: 1
-  bombRank: 6
+  bombKind: 4
+  _indexedPosition: {x: 0, y: 0}
   text: {fileID: 0}
 --- !u!61 &4200552251346471384
 BoxCollider2D:

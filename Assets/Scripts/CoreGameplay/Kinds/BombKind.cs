@@ -1,10 +1,10 @@
 ﻿namespace CoreGameplay.Kinds
 {
-    public enum MatchKind
+    public enum BombKind
     {
-        Zero = 0,
         Horizontal = 1,
         Vertical = 2,
-        Cross = 3
+        Bomb = 3,
+        Color = 4
     }
 }

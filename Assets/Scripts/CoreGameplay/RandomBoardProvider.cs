@@ -14,7 +14,7 @@ namespace CoreGameplay
                 {
                     if (y == height - 1)
                     {
-                        result[x, y] = NodeFactory.Instance.GetGenerator();
+                        result[x, y] = NodeFactory.Instance.GetRandomPrefab();
                     }
                     else
                     {

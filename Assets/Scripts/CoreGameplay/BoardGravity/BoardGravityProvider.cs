@@ -40,7 +40,7 @@ namespace CoreGameplay.BoardGravity
 
                     if (dd != pos)
                     {
-                        nodeBoard.SwipeTwoNodes(pos , dd);
+                        nodeBoard.FallNode(pos , dd);
                         counter++;
                         continue;
                     }
@@ -52,7 +52,7 @@ namespace CoreGameplay.BoardGravity
                         {
                             if (nodeBoard.IsInsideBoard(dr) && board[dr.x, dr.y] == null)
                             {
-                                nodeBoard.SwipeTwoNodes(pos , dr);
+                                nodeBoard.FallNode(pos , dr);
                                 _road = !_road;
                                 counter++;
                                 continue;
@@ -66,7 +66,7 @@ namespace CoreGameplay.BoardGravity
                         {
                             if (nodeBoard.IsInsideBoard(dl) && board[dl.x, dl.y] == null)
                             {
-                                nodeBoard.SwipeTwoNodes(pos , dl);
+                                nodeBoard.FallNode(pos , dl);
                                 _road = !_road;
                                 counter++;
                                 continue;

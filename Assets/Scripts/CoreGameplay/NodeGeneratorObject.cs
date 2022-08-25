@@ -13,10 +13,10 @@ namespace CoreGameplay
             var b = board.GetBoard();
             var pVec = _position + Direction;
 
-            if (board.IsInsideBoard(pVec) && b[pVec.x , pVec.y] == null)
-            {
-                board.SetNode(pVec,NodeFactory.Instance.GetRandomPrefab());    
-            }
+            //if (board.IsInsideBoard(pVec) && b[pVec.x , pVec.y] == null)
+            //{
+            //    board.SetNode(pVec,NodeFactory.Instance.GetRandomPrefab());    
+            //}
         }
         
         public void Init(Vector2Int position)

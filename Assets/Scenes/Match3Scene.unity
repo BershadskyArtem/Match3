@@ -300,11 +300,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa878c2de84d4a0a8640d2482f302ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CheckDelay: 0.15
-  GravityDelay: 0.2
-  Gap: 1
-  SwapTime: 0.2
-  FallTime: 0.3
+  CheckDelay: 0.3
+  GravityDelay: 0.25
+  Gap: 1.2
+  SwapTime: 0.1
+  FallTime: 0.15
   DeathScaleTime: 0.5
   FlyAwayTime: 1
   FallCurve:
@@ -676,7 +676,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541266846}
         m_TargetAssemblyTypeName: CoreGameplay.NodeBoard, Assembly-CSharp
-        m_MethodName: LoadBoard
+        m_MethodName: RandomBoard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -925,9 +925,10 @@ MonoBehaviour:
   unknownNodePrefab: {fileID: 8878637107335432177, guid: 71df773d496cf5246b0a426165fdad9c, type: 3}
   destroyPrefab: {fileID: 0}
   standartRandomGenerator: {fileID: 8878637107335432177, guid: 71df773d496cf5246b0a426165fdad9c, type: 3}
-  Bomb4: {fileID: 4048516149771604230, guid: 0344e65d45ed1b14890b2da5ea40752e, type: 3}
-  Bomb5: {fileID: 1459624366489392549, guid: c893bfa7b5783fd488b3ed2ba05509d1, type: 3}
-  Bomb6: {fileID: 4200552251346471388, guid: 110613d6bb79f5d44a2015f539975d0b, type: 3}
+  VerticalBomb: {fileID: 911011561432267348, guid: 5730480707dd0ad49bda2608a4d6c692, type: 3}
+  HorizontalBomb: {fileID: 7249495008777496652, guid: 012989477becb2d438359cf002a7bffe, type: 3}
+  BiggestBomb: {fileID: 4200552251346471388, guid: 110613d6bb79f5d44a2015f539975d0b, type: 3}
+  Bomb: {fileID: 1459624366489392549, guid: c893bfa7b5783fd488b3ed2ba05509d1, type: 3}
 --- !u!1 &2030255525
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,7 +1006,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2030255525}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 6.63, y: 4.18, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

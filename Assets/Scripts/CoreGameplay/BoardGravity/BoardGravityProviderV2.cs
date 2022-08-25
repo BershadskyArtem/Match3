@@ -26,7 +26,7 @@ namespace CoreGameplay.BoardGravity
                     for (int i = y + 1; i < height; i++)
                     {
                         if (board[x, i] == null) continue;
-                        nodeBoard.SwipeTwoNodes(pos , pos + Vector2Int.up , true);
+                        nodeBoard.FallNode(pos , pos + Vector2Int.up);
                         counter++;
                         up = true;
                         break;

@@ -20,6 +20,7 @@ namespace CoreGameplay
         private readonly IMatchDiagnoser _matchDiagnoser;
         private readonly IBoardGravityProvider _gravityProvider;
         private readonly INodeSpawner _nodeSpawner;
+      
 
         private NodeObject _activeNode;
 
@@ -170,8 +171,6 @@ namespace CoreGameplay
             
             if(cancelOther) return;
 
-            if(cancelMain || cancelOther) return;
-            
             _lastMain = mainPos;
             _lastOther = otherPos;
             
@@ -293,6 +292,9 @@ namespace CoreGameplay
             Debug.Log($"Boom {boomKind}");
         }
 
+        
+        
+
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x, pos.y);
 
         public bool IsInsideBoard(int x, int y)
@@ -309,4 +311,6 @@ namespace CoreGameplay
             (_board[xFrom, yFrom], _board[xTo, yTo]) = (_board[xTo, yTo], _board[xFrom, yFrom]);
         }
     }
+
+ 
 }

@@ -300,8 +300,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa878c2de84d4a0a8640d2482f302ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CheckDelay: 0.3
-  GravityDelay: 0.25
+  CheckDelay: 0.25
+  GravityDelay: 0.2
   Gap: 1.2
   SwapTime: 0.1
   FallTime: 0.15

@@ -2,8 +2,8 @@
 
 namespace CoreGameplay.Base
 {
-    public interface IMatchRule
+    public interface IMatchRule<T>
     {
-        public bool TryGetMatchAtPoint(NodeObject[,] board, int xPos, int yPos, ref Match match);
+        public bool TryGetMatchAtPoint(T board, int xPos, int yPos, ref Match match);
     }
 }

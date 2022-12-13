@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
 using CoreGameplay.Base;
 using CoreGameplay.Kinds;
-using CoreGameplay.Matches;
+using CoreGameplay.Nodes;
 using UnityEngine;
 
-namespace CoreGameplay.Implementations
+namespace CoreGameplay.Matches
 {
-    public class MatchDiagnoser : IMatchDiagnoser<NodeObject[,]>
+    public class InfoMatchDiagnoser : IMatchDiagnoser<NodeInfo[,]>
     {
-        private readonly List<IMatchRule<NodeObject[,]>> _matchRules;
+        
+        private readonly List<IMatchRule<NodeInfo[,]>> _matchRules;
 
         private bool[,] _matchedMap;
 
-        public MatchDiagnoser()
+        public InfoMatchDiagnoser()
         {
-            _matchRules = new List<IMatchRule<NodeObject[,]>>();
+            _matchRules = new List<IMatchRule<NodeInfo[,]>>();
         }
         
-        public IEnumerable<Match> GetMatchesFromBoard(NodeObject[,] board)
+        public IEnumerable<Match> GetMatchesFromBoard(NodeInfo[,] board)
         {
             if (board == null) return new List<Match>();
             
@@ -38,7 +39,7 @@ namespace CoreGameplay.Implementations
                     
                     foreach (var matchRule in _matchRules)
                     {
-                        var m = new Match(new Vector2Int(x , y) , board[x,y].GetColor());
+                        var m = new Match(new Vector2Int(x , y) , board[x,y].Color);
                         if (!matchRule.TryGetMatchAtPoint(board, x, y, ref m)) continue;
                         
                         result.Add(m);
@@ -54,11 +55,11 @@ namespace CoreGameplay.Implementations
             return result;
         }
 
-        public Match GetMatchAtPoint(NodeObject[,] board, int xPos, int yPos)
+        public Match GetMatchAtPoint(NodeInfo[,] board, int xPos, int yPos)
         {
             if(board[xPos,yPos] == null)  return Match.Zero; 
             var pos = new Vector2Int(xPos , yPos);
-            var nodeColor = board[xPos, yPos].GetColor();
+            var nodeColor = board[xPos, yPos].Color;
             if(nodeColor == NodeColor.Unknown) return Match.Zero;
             
             foreach (var matchRule in _matchRules)
@@ -71,16 +72,15 @@ namespace CoreGameplay.Implementations
             }
             return Match.Zero;
         }
-        
 
-        public IMatchDiagnoser<NodeObject[,]> AddMatchRule(IMatchRule<NodeObject[,]> rule)
+        public IMatchDiagnoser<NodeInfo[,]> AddMatchRule(IMatchRule<NodeInfo[,]> rule)
         {
             if(_matchRules.Contains(rule))return this;
             _matchRules.Add(rule);
             return this;
         }
 
-        public IMatchDiagnoser<NodeObject[,]> ResetRules()
+        public IMatchDiagnoser<NodeInfo[,]> ResetRules()
         {
             _matchRules.Clear();
             return this;

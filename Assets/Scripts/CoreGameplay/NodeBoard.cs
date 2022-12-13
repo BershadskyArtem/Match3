@@ -5,7 +5,9 @@ using CoreGameplay.Implementations;
 using CoreGameplay.Kinds;
 using CoreGameplay.Matches;
 using CoreGameplay.Matches.Rules;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Direction = CoreGameplay.Kinds.Direction;
 
 namespace CoreGameplay
 {
@@ -17,9 +19,10 @@ namespace CoreGameplay
         
         private NodeObject[,] _board;
         private readonly IBoardProvider _boardProvider;
-        private readonly IMatchDiagnoser _matchDiagnoser;
+        private readonly IMatchDiagnoser<NodeObject[,]> _matchDiagnoser;
         private readonly IBoardGravityProvider _gravityProvider;
         private readonly INodeSpawner _nodeSpawner;
+        private readonly ExplosionManager _explosions;
       
 
         private NodeObject _activeNode;
@@ -29,14 +32,18 @@ namespace CoreGameplay
         
         public NodeBoard()
         {
+            _explosions = new ExplosionManager();
             _nodeSpawner = new LineSpawner();
-            _boardProvider = new RandomBoardProvider();
+            _boardProvider = new RandomBoardProvider(new InfoMatchDiagnoser());
             _gravityProvider = new BoardGravityProviderV2();
             _matchDiagnoser = new MatchDiagnoser()
                 .AddMatchRule(new CrossMatchRule())
                 .AddMatchRule(new HorizontalMatchRule())
                 .AddMatchRule(new VerticalMatchRule());
         }
+
+        public int Height => height;
+        public int Width => width;
 
         private void OnEnable()
         {
@@ -88,51 +95,69 @@ namespace CoreGameplay
 
         public void RandomBoard()
         {
+            if(_board != null)
+                DestroyBoard();
+            
             _board ??= new NodeObject[width, height];
             
             var prefabs = _boardProvider.GetNewBoard(width, height);
             
+
             for (int x = 0; x < _board.GetLength(0); x++)
             {
                 for (int y = 0; y < _board.GetLength(1); y++)
                 {
                         _board[x,y]?.DestroyNode();
                         _board[x,y] = null;
-                        Spawn(x, y, x, 15, prefabs[x, y]);
+                        Spawn(x, y, x, 15, prefabs[x,y]);
                 }
             }
 
-            VerifyBoard();
+            //VerifyBoard(_board);
+        }
+
+        private void DestroyBoard()
+        {
+            for (int x = 0; x < _board.GetLength(0); x++)
+            {
+                for (int y = 0; y < _board.GetLength(1); y++)
+                {
+                    _board[x,y]?.DestroyNode();
+                    _board[x, y] = null;
+                }
+            }
         }
 
 
-        public void VerifyBoard()
+        public void VerifyBoard(NodeObject[,] board)
         {
             int counter = 1;
             int stupid = 0;
 
             while (counter !=0 && stupid < 50)
             {
-                var matches = _matchDiagnoser.GetMatchesFromBoard(_board);
+                var matches = _matchDiagnoser.GetMatchesFromBoard(board);
                 if (matches.Count() == 0) return;
                 stupid++;
                 foreach (var match in matches)
                 {
                     var prefab = 
-                        NodeFactory.Instance.GetOpposite(_board[match.Center.x, match.Center.y].GetColor());
-                    _board[match.Center.x,match.Center.y].DestroyWithNoAnimation();
+                        NodeFactory.Instance.GetOpposite(board[match.Center.x, match.Center.y].GetColor());
+                    board[match.Center.x,match.Center.y].DestroyWithNoAnimation();
                     
-                    var inst = Instantiate(prefab);
-                    var nodeObject = inst.GetComponent<NodeObject>();
-                    nodeObject.SetBoard(this);
-                    nodeObject.ForcePosition(match.Center);
-                    _board[match.Center.x, match.Center.y] = nodeObject;
+                    Spawn(match.Center.x, match.Center.y, match.Center.x, 15, prefab);
+                    
+                    //var inst = Instantiate(prefab);
+                    //var nodeObject = inst.GetComponent<NodeObject>();
+                    //nodeObject.SetBoard(this);
+                    //nodeObject.ForcePosition(match.Center);
+                    //board[match.Center.x, match.Center.y] = nodeObject;
                 }
             }
 
             if (stupid >= 50)
             {
-                Debug.Log("Stupid Lock");
+                Debug.LogError("Stupid Lock");
             }
         }
         
@@ -186,13 +211,13 @@ namespace CoreGameplay
             
             if (!Match.isZero(otherMatch))
             {
-                ResolveMatch(otherMatch);
+                ResolveMatch(otherMatch, true);
                 isAtLeastOneMatch = true;
             }
 
             if (!Match.isZero(mainMatch))
             {
-                ResolveMatch(mainMatch);
+                ResolveMatch(mainMatch, true);
                 isAtLeastOneMatch = true;
             }
             
@@ -238,62 +263,100 @@ namespace CoreGameplay
             (_board[_lastMain.x, _lastMain.y], _board[_lastOther.x, _lastOther.y]) = (_board[_lastOther.x, _lastOther.y], _board[_lastMain.x, _lastMain.y]);
         }
 
-        private void ResolveMatch(Match mainMatch)
+        private void ResolveMatch(Match mainMatch, bool useOrigins = false)
         {
             foreach (var pos in mainMatch.Positions)
             {
-                _board[pos.x , pos.y]?.ResolveAsPartOfMatch(mainMatch.Center);
+                _board[pos.x, pos.y]?.ResolveAsPartOfMatch(useOrigins ? mainMatch.Origin : mainMatch.Center);
                 _board[pos.x, pos.y] = null;
             }
 
             var prefab = mainMatch.BombPrefab;
             if(prefab == null) return;
-            _board[mainMatch.Center.x,mainMatch.Center.y]?.DestroyWithNoAnimation();
-            var inst = Instantiate(prefab);
-            var nodeObject = inst.GetComponent<NodeObject>();
-            nodeObject.SetBoard(this);
-            nodeObject.ForcePosition(mainMatch.Center);
-            _board[mainMatch.Center.x, mainMatch.Center.y] = nodeObject;
+
+            if (useOrigins)
+            {
+                _board[mainMatch.Origin.x,mainMatch.Origin.y]?.DestroyWithNoAnimation();
+                var inst = Instantiate(prefab);
+                var nodeObject = inst.GetComponent<NodeObject>();
+                nodeObject.SetBoard(this);
+                nodeObject.ForcePosition(mainMatch.Origin);
+                _board[mainMatch.Origin.x, mainMatch.Origin.y] = nodeObject;
+            }
+            else
+            {
+                _board[mainMatch.Center.x,mainMatch.Center.y]?.DestroyWithNoAnimation();
+                var inst = Instantiate(prefab);
+                var nodeObject = inst.GetComponent<NodeObject>();
+                nodeObject.SetBoard(this);
+                nodeObject.ForcePosition(mainMatch.Center);
+                _board[mainMatch.Center.x, mainMatch.Center.y] = nodeObject;
+            }
+            
             
         }
 
-        public void Boom(BombKind bombKind , NodeObject other = null)
+        public void Boom(BombKind bombKind , NodeObject main, NodeObject other = null)
         {
             switch (bombKind)
             {
                 case BombKind.Horizontal:
                 {
-                    Boom(ExplosionKind.Horizontal, other);
+                    Boom(ExplosionKind.Horizontal,main, other);
                     break;
                 }
                 
                 case BombKind.Vertical:
                 {
-                    Boom(ExplosionKind.Vertical, other);
+                    Boom(ExplosionKind.Vertical,main, other);
                     break;
                 }
                 
                 case BombKind.Bomb:
                 {
-                    Boom(ExplosionKind.Bomb, other);
+                    Boom(ExplosionKind.Bomb,main, other);
                     break;
                 }
                 
                 case BombKind.Color:
                 {
-                    Boom(ExplosionKind.Color , other);
+                    Boom(ExplosionKind.Color ,main, other);
                     break;
                 }
             }
         }
-        
-        public void Boom(ExplosionKind boomKind , NodeObject other = null)
+
+        private ExplosionKind _lastExplosionKind;
+        private NodeObject _lastMainNode;
+        private NodeObject _lastOtherNode;
+
+        public void Boom(ExplosionKind boomKind ,NodeObject main, NodeObject other = null)
         {
-            Debug.Log($"Boom {boomKind}");
+            _lastMainNode = main;
+            _lastOtherNode = other;
+            _lastExplosionKind = boomKind;
+            Invoke(nameof(BoomInternal) , AnimationNumbers.SwipeCheckDelay);
         }
 
+        private void BoomInternal()
+        {
+            _explosions.Blow(_lastExplosionKind, _lastMainNode, _lastOtherNode, this);
+            Invoke(nameof(ApplyGravity) , AnimationNumbers.GravityApplyDelay + AnimationNumbers.SwipeCheckDelay / 2f);
+        }
+
+        public void DestroyNode(Vector2Int pos) => DestroyNode(pos.x, pos.y);
+
+        public void DestroyNode(int x , int y)
+        {
+            _board[x, y]?.ResolveAsPartOfMatch();
+            _board[x,y] = null;
+        }
         
-        
+        public void DestroyNode(int x , int y, float delay)
+        {
+            _board[x, y]?.ResolveAsPartOfMatch(delay);
+            _board[x,y] = null;
+        }
 
         public bool IsInsideBoard(Vector2Int pos) => IsInsideBoard(pos.x, pos.y);
 

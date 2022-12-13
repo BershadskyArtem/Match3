@@ -63,6 +63,9 @@ namespace CoreGameplay.Matches
                         Positions.OrderBy(v => v.x);
                         if (Rank == 3) 
                             return Positions[1];
+                        if (Rank == 5)
+                            return Positions[2];
+                        
                         var lowest = Positions.First();
                         return new Vector2Int( lowest.x + Mathf.CeilToInt(Positions.Count / 2f) - 1  , Origin.y);
                     }else if (Kind == MatchKind.Vertical)
@@ -70,6 +73,8 @@ namespace CoreGameplay.Matches
                         Positions.OrderBy(v => v.y);
                         if (Rank == 3) 
                             return Positions[1];
+                        if (Rank == 5)
+                            return Positions[2];
                         
                         var leftest = Positions.First();
                         return new Vector2Int( Origin.x , leftest.y + Mathf.CeilToInt(Positions.Count / 2f) - 1 );
@@ -86,7 +91,8 @@ namespace CoreGameplay.Matches
                 if (Kind == MatchKind.Cross)
                 {
                     return NodeFactory.Instance.GetBomb(BombKind.Bomb);
-                }else if (Kind == MatchKind.Horizontal)
+                }
+                else if (Kind == MatchKind.Horizontal)
                 {
                     if (Rank == 4)
                     {

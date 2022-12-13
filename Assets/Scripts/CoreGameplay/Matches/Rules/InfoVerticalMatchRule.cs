@@ -1,25 +1,27 @@
 ﻿using CoreGameplay.Base;
 using CoreGameplay.Kinds;
+using CoreGameplay.Nodes;
 using UnityEngine;
 
 namespace CoreGameplay.Matches.Rules
 {
-    public class VerticalMatchRule : IMatchRule<NodeObject[,]>
+    public class InfoVerticalMatchRule : IMatchRule<NodeInfo[,]>
     {
-        public bool TryGetMatchAtPoint(NodeObject[,] board, int xPos, int yPos, ref Match match)
+        public bool TryGetMatchAtPoint(NodeInfo[,] board, int xPos, int yPos, ref Match match)
         {
             int height = board.GetLength(1);
-            var swap = board[xPos, yPos].GetMatchable();
-            if (!swap.CanMatch()) return false;
-            var id = swap.GetID();
+            bool isMatchable = board[xPos, yPos].IsMatchable;
+            
+            if (!isMatchable) return false;
+            var id = board[xPos, yPos].Color;
             
             //bottom to the top
             for (int y = yPos; y < height; y++)
             {
                 if(board[xPos, y] == null) break;
-                var swap2 = board[xPos, y].GetMatchable();
-                if (!swap2.CanMatch()) break;
-                if (swap2.GetID() != id) break;
+                var isMatchable2 = board[xPos, y].IsMatchable;
+                if (!isMatchable2) break;
+                if (board[xPos, y].Color != id) break;
                 
                 match.AddPosition(new Vector2Int(xPos , y));
             }
@@ -27,9 +29,9 @@ namespace CoreGameplay.Matches.Rules
             for (int y = yPos; y >= 0; y--)
             {
                 if(board[xPos, y] == null) break;
-                var swap2 = board[xPos, y].GetMatchable();
-                if (!swap2.CanMatch()) break;
-                if (swap2.GetID() != id) break;
+                var isMatchable2 = board[xPos, y].IsMatchable;
+                if (!isMatchable2) break;
+                if (board[xPos, y].Color != id) break;
                 
                 match.AddPosition(new Vector2Int(xPos , y));
             }

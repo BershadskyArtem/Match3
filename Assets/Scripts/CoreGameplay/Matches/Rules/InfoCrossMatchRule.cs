@@ -1,21 +1,21 @@
 ﻿using CoreGameplay.Base;
 using CoreGameplay.Kinds;
+using CoreGameplay.Nodes;
 
 namespace CoreGameplay.Matches.Rules
 {
-    public class CrossMatchRule : IMatchRule<NodeObject[,]>
+    public class InfoCrossMatchRule : IMatchRule<NodeInfo[,]>
     {
+        private readonly IMatchRule<NodeInfo[,]> hr;
+        private readonly IMatchRule<NodeInfo[,]> vr;
 
-        private readonly IMatchRule<NodeObject[,]> hr;
-        private readonly IMatchRule<NodeObject[,]> vr;
-
-        public CrossMatchRule()
+        public InfoCrossMatchRule()
         {
-            hr = new HorizontalMatchRule();
-            vr = new VerticalMatchRule();
+            hr = new InfoHorizontalMatchRule();
+            vr = new InfoVerticalMatchRule();
         }
         
-        public bool TryGetMatchAtPoint(NodeObject[,] board, int xPos, int yPos, ref Match match)
+        public bool TryGetMatchAtPoint(NodeInfo[,] board, int xPos, int yPos, ref Match match)
         {
             var mh = match.CloneWithoutPositions();
             var mv = match.CloneWithoutPositions();

@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreGameplay.Kinds;
+using CoreGameplay.Nodes;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -97,8 +98,51 @@ namespace CoreGameplay
                 }
             }
             return null;
+        }
 
+        public GameObject GetNodeFromInfo(NodeInfo info)
+        {
+            return GetPrefab(info.Color);
+        }
 
+        public NodeInfo ToOppositeNodeInfo(NodeInfo info)
+        {
+            var result = GetRandomNodeInfo();
+
+            switch (info.Color)
+            {
+                case NodeColor.Red:
+                    result.Color = NodeColor.Blue;
+                    break;
+                case NodeColor.Green:
+                    result.Color = NodeColor.Yellow;
+                    break;
+                case NodeColor.Yellow:
+                    result.Color = NodeColor.Red;
+                    break;
+                case NodeColor.Blue:
+                    result.Color = NodeColor.Green;
+                    break;
+                case NodeColor.Unknown:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return result;
+
+        }
+        
+        public NodeInfo GetRandomNodeInfo()
+        {
+            return new NodeInfo()
+            {
+                IsBomb = false,
+                BombKind = BombKind.Bomb,
+                Color = (NodeColor)Random.Range(1, 5),
+                IsMatchable = true,
+                IsSwappable = true
+            };
         }
         
     }
